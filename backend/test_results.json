@@ -17,13 +17,13 @@
       "success": true,
       "message": "Registrasi akun berhasil!",
       "data": {
-        "_id": "6ab7c2130e8457a15d7f3b4f",
+        "_id": "6ab7c6bab42b69d3b1862b37",
         "nama": "Pencari Baru",
         "email": "pencari.baru@gmail.com",
         "nomor_telepon": "081234567800",
         "role": "pencari",
         "foto_profil": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYjdjMjEzMGU4NDU3YTE1ZDdmM2I0ZiIsInJvbGUiOiJwZW5jYXJpIiwiaWF0IjoxNzkwNDI3NjY3LCJleHAiOjE3OTEwMzI0Njd9.Xmajfu-7C_z7VFSPles1T4S2Z_fLnMb-3wQNfieGQfY"
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYjdjNmJhYjQyYjY5ZDNiMTg2MmIzNyIsInJvbGUiOiJwZW5jYXJpIiwiaWF0IjoxNzkwNDI4ODU5LCJleHAiOjE3OTEwMzM2NTl9.nJ_WiBMHSMk9guwGpM-neRBoh9GkfWnWO4AmqzWFEbw"
       }
     }
   },
@@ -42,13 +42,13 @@
       "success": true,
       "message": "Login berhasil!",
       "data": {
-        "_id": "6ab7c212c7e98f49b829055b",
+        "_id": "6ab7c67cb399d1bec07aa6d1",
         "nama": "Administrator Portal",
         "email": "admin@gmail.com",
         "nomor_telepon": "081234567890",
         "role": "admin",
         "foto_profil": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYjdjMjEyYzdlOThmNDliODI5MDU1YiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5MDQyNzY2NywiZXhwIjoxNzkxMDMyNDY3fQ.9rdji7bl6YO-IMEwwFJ5jdmODrvCY6DIlelqcOuN7E8"
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYjdjNjdjYjM5OWQxYmVjMDdhYTZkMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5MDQyODg1OSwiZXhwIjoxNzkxMDMzNjU5fQ.fDFrO8qBxep_GV1vnMHwqXi8ix0VvSNuckvryGSllRw"
       }
     }
   },
@@ -63,14 +63,14 @@
     "resBody": {
       "success": true,
       "data": {
-        "_id": "6ab7c212c7e98f49b8290561",
+        "_id": "6ab7c67db399d1bec07aa6d7",
         "nama": "Pencari Kos Satu",
         "email": "pencari1@gmail.com",
         "nomor_telepon": "085712345678",
         "role": "pencari",
         "foto_profil": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
-        "createdAt": "2026-09-26T13:01:06.830Z",
-        "updatedAt": "2026-09-26T13:01:06.830Z",
+        "createdAt": "2026-09-26T13:19:57.054Z",
+        "updatedAt": "2026-09-26T13:19:57.054Z",
         "__v": 0
       }
     }
@@ -131,10 +131,10 @@
         "catatan_verifikasi": "",
         "diverifikasi_oleh": null,
         "diverifikasi_pada": null,
-        "pemilik_id": "6ab7c212c7e98f49b829055d",
-        "_id": "6ab7c2130e8457a15d7f3b5d",
-        "createdAt": "2026-09-26T13:01:07.807Z",
-        "updatedAt": "2026-09-26T13:01:07.807Z",
+        "pemilik_id": "6ab7c67cb399d1bec07aa6d3",
+        "_id": "6ab7c6bbb42b69d3b1862b47",
+        "createdAt": "2026-09-26T13:20:59.357Z",
+        "updatedAt": "2026-09-26T13:20:59.357Z",
         "__v": 0
       }
     }
@@ -182,7 +182,7 @@
             "latitude": -7.766,
             "longitude": 110.373
           },
-          "_id": "6ab7c2130e8457a15d7f3b5d",
+          "_id": "6ab7c6bbb42b69d3b1862b47",
           "nama": "Griya Singgah Pogung Permai",
           "deskripsi": "Kos putra baru renovasi, lingkungan sejuk dan aman di kawasan Pogung Kidul.",
           "alamat": "Jl. Pogung Kidul Gang Babarsari No. 10, Sinduadi, Sleman",
@@ -210,13 +210,13 @@
           "diverifikasi_oleh": null,
           "diverifikasi_pada": null,
           "pemilik_id": {
-            "_id": "6ab7c212c7e98f49b829055d",
+            "_id": "6ab7c67cb399d1bec07aa6d3",
             "nama": "Pemilik Kos Satu",
             "email": "pemilik1@gmail.com",
             "nomor_telepon": "081298765432"
           },
-          "createdAt": "2026-09-26T13:01:07.807Z",
-          "updatedAt": "2026-09-26T13:01:07.807Z",
+          "createdAt": "2026-09-26T13:20:59.357Z",
+          "updatedAt": "2026-09-26T13:20:59.357Z",
           "__v": 0
         },
         {
@@ -224,7 +224,7 @@
             "latitude": -7.7645,
             "longitude": 110.3719
           },
-          "_id": "6ab7c212c7e98f49b829056a",
+          "_id": "6ab7c67db399d1bec07aa6e0",
           "nama": "Kos Pogung Raya Indah (Menunggu Verifikasi)",
           "deskripsi": "Pendaftaran kos baru oleh pemilik. Memiliki 8 kamar dengan tarif bersaing di Pogung.",
           "alamat": "Jl. Pogung Raya No. 99, Sinduadi, Mlati, Sleman",
@@ -251,14 +251,14 @@
           "diverifikasi_oleh": null,
           "diverifikasi_pada": null,
           "pemilik_id": {
-            "_id": "6ab7c212c7e98f49b829055d",
+            "_id": "6ab7c67cb399d1bec07aa6d3",
             "nama": "Pemilik Kos Satu",
             "email": "pemilik1@gmail.com",
             "nomor_telepon": "081298765432"
           },
           "__v": 0,
-          "createdAt": "2026-09-26T13:01:06.938Z",
-          "updatedAt": "2026-09-26T13:01:06.938Z"
+          "createdAt": "2026-09-26T13:19:57.226Z",
+          "updatedAt": "2026-09-26T13:19:57.226Z"
         }
       ]
     }
@@ -267,7 +267,7 @@
     "no": 7,
     "title": "Admin Memverifikasi Kos Menjadi APPROVED",
     "method": "PATCH",
-    "endpoint": "/api/admin/kos/6ab7c2130e8457a15d7f3b5d/verifikasi",
+    "endpoint": "/api/admin/kos/6ab7c6bbb42b69d3b1862b47/verifikasi",
     "access": "Private (Admin)",
     "reqBody": {
       "status_verifikasi": "approved",
@@ -282,7 +282,7 @@
           "latitude": -7.766,
           "longitude": 110.373
         },
-        "_id": "6ab7c2130e8457a15d7f3b5d",
+        "_id": "6ab7c6bbb42b69d3b1862b47",
         "nama": "Griya Singgah Pogung Permai",
         "deskripsi": "Kos putra baru renovasi, lingkungan sejuk dan aman di kawasan Pogung Kidul.",
         "alamat": "Jl. Pogung Kidul Gang Babarsari No. 10, Sinduadi, Sleman",
@@ -307,11 +307,11 @@
         "jumlah_kamar_tersedia": 4,
         "status_verifikasi": "approved",
         "catatan_verifikasi": "Survei lokasi valid dan dokumen kepemilikan terverifikasi.",
-        "diverifikasi_oleh": "6ab7c212c7e98f49b829055b",
-        "diverifikasi_pada": "2026-09-26T13:01:07.827Z",
-        "pemilik_id": "6ab7c212c7e98f49b829055d",
-        "createdAt": "2026-09-26T13:01:07.807Z",
-        "updatedAt": "2026-09-26T13:01:07.827Z",
+        "diverifikasi_oleh": "6ab7c67cb399d1bec07aa6d1",
+        "diverifikasi_pada": "2026-09-26T13:20:59.624Z",
+        "pemilik_id": "6ab7c67cb399d1bec07aa6d3",
+        "createdAt": "2026-09-26T13:20:59.357Z",
+        "updatedAt": "2026-09-26T13:20:59.625Z",
         "__v": 0
       }
     }
@@ -339,7 +339,7 @@
             "latitude": -7.766,
             "longitude": 110.373
           },
-          "_id": "6ab7c2130e8457a15d7f3b5d",
+          "_id": "6ab7c6bbb42b69d3b1862b47",
           "nama": "Griya Singgah Pogung Permai",
           "deskripsi": "Kos putra baru renovasi, lingkungan sejuk dan aman di kawasan Pogung Kidul.",
           "alamat": "Jl. Pogung Kidul Gang Babarsari No. 10, Sinduadi, Sleman",
@@ -364,16 +364,16 @@
           "jumlah_kamar_tersedia": 4,
           "status_verifikasi": "approved",
           "catatan_verifikasi": "Survei lokasi valid dan dokumen kepemilikan terverifikasi.",
-          "diverifikasi_oleh": "6ab7c212c7e98f49b829055b",
-          "diverifikasi_pada": "2026-09-26T13:01:07.827Z",
+          "diverifikasi_oleh": "6ab7c67cb399d1bec07aa6d1",
+          "diverifikasi_pada": "2026-09-26T13:20:59.624Z",
           "pemilik_id": {
-            "_id": "6ab7c212c7e98f49b829055d",
+            "_id": "6ab7c67cb399d1bec07aa6d3",
             "nama": "Pemilik Kos Satu",
             "email": "pemilik1@gmail.com",
             "nomor_telepon": "081298765432"
           },
-          "createdAt": "2026-09-26T13:01:07.807Z",
-          "updatedAt": "2026-09-26T13:01:07.827Z",
+          "createdAt": "2026-09-26T13:20:59.357Z",
+          "updatedAt": "2026-09-26T13:20:59.625Z",
           "__v": 0
         },
         {
@@ -381,7 +381,7 @@
             "latitude": -7.7654,
             "longitude": 110.3725
           },
-          "_id": "6ab7c212c7e98f49b8290565",
+          "_id": "6ab7c67db399d1bec07aa6db",
           "nama": "Kos Singgah Eksklusif Pogung Tipe A",
           "deskripsi": "Kos putra eksklusif dengan fasilitas lengkap, berjarak hanya 5 menit jalan kaki dari Fakultas Teknik UGM. Lingkungan tenang, aman, dan dekat dengan berbagai tempat makan.",
           "alamat": "Jl. Pogung Kidul No. 42B, Sinduadi, Mlati, Sleman",
@@ -414,17 +414,17 @@
           "jumlah_kamar_tersedia": 3,
           "status_verifikasi": "approved",
           "catatan_verifikasi": "Data dan izin operasional kos telah diverifikasi oleh Admin.",
-          "diverifikasi_oleh": "6ab7c212c7e98f49b829055b",
-          "diverifikasi_pada": "2026-09-26T13:01:06.934Z",
+          "diverifikasi_oleh": "6ab7c67cb399d1bec07aa6d1",
+          "diverifikasi_pada": "2026-09-26T13:19:57.222Z",
           "pemilik_id": {
-            "_id": "6ab7c212c7e98f49b829055d",
+            "_id": "6ab7c67cb399d1bec07aa6d3",
             "nama": "Pemilik Kos Satu",
             "email": "pemilik1@gmail.com",
             "nomor_telepon": "081298765432"
           },
           "__v": 0,
-          "createdAt": "2026-09-26T13:01:06.938Z",
-          "updatedAt": "2026-09-26T13:01:06.938Z"
+          "createdAt": "2026-09-26T13:19:57.226Z",
+          "updatedAt": "2026-09-26T13:19:57.226Z"
         }
       ]
     }
@@ -433,7 +433,7 @@
     "no": 9,
     "title": "Pencari Menambahkan Kos ke Daftar Favorit",
     "method": "POST",
-    "endpoint": "/api/favorit/6ab7c2130e8457a15d7f3b5d",
+    "endpoint": "/api/favorit/6ab7c6bbb42b69d3b1862b47",
     "access": "Private (Pencari)",
     "reqBody": null,
     "resStatus": 201,
@@ -441,11 +441,11 @@
       "success": true,
       "message": "Kos berhasil ditambahkan ke daftar favorit",
       "data": {
-        "user_id": "6ab7c212c7e98f49b8290561",
-        "kos_id": "6ab7c2130e8457a15d7f3b5d",
-        "_id": "6ab7c2130e8457a15d7f3b6e",
-        "createdAt": "2026-09-26T13:01:07.840Z",
-        "updatedAt": "2026-09-26T13:01:07.840Z",
+        "user_id": "6ab7c67db399d1bec07aa6d7",
+        "kos_id": "6ab7c6bbb42b69d3b1862b47",
+        "_id": "6ab7c6bbb42b69d3b1862b58",
+        "createdAt": "2026-09-26T13:20:59.829Z",
+        "updatedAt": "2026-09-26T13:20:59.829Z",
         "__v": 0
       }
     }
@@ -463,14 +463,14 @@
       "count": 2,
       "data": [
         {
-          "_id": "6ab7c2130e8457a15d7f3b6e",
-          "user_id": "6ab7c212c7e98f49b8290561",
+          "_id": "6ab7c6bbb42b69d3b1862b58",
+          "user_id": "6ab7c67db399d1bec07aa6d7",
           "kos_id": {
             "koordinat": {
               "latitude": -7.766,
               "longitude": 110.373
             },
-            "_id": "6ab7c2130e8457a15d7f3b5d",
+            "_id": "6ab7c6bbb42b69d3b1862b47",
             "nama": "Griya Singgah Pogung Permai",
             "deskripsi": "Kos putra baru renovasi, lingkungan sejuk dan aman di kawasan Pogung Kidul.",
             "alamat": "Jl. Pogung Kidul Gang Babarsari No. 10, Sinduadi, Sleman",
@@ -495,31 +495,31 @@
             "jumlah_kamar_tersedia": 4,
             "status_verifikasi": "approved",
             "catatan_verifikasi": "Survei lokasi valid dan dokumen kepemilikan terverifikasi.",
-            "diverifikasi_oleh": "6ab7c212c7e98f49b829055b",
-            "diverifikasi_pada": "2026-09-26T13:01:07.827Z",
+            "diverifikasi_oleh": "6ab7c67cb399d1bec07aa6d1",
+            "diverifikasi_pada": "2026-09-26T13:20:59.624Z",
             "pemilik_id": {
-              "_id": "6ab7c212c7e98f49b829055d",
+              "_id": "6ab7c67cb399d1bec07aa6d3",
               "nama": "Pemilik Kos Satu",
               "email": "pemilik1@gmail.com",
               "nomor_telepon": "081298765432"
             },
-            "createdAt": "2026-09-26T13:01:07.807Z",
-            "updatedAt": "2026-09-26T13:01:07.827Z",
+            "createdAt": "2026-09-26T13:20:59.357Z",
+            "updatedAt": "2026-09-26T13:20:59.625Z",
             "__v": 0
           },
-          "createdAt": "2026-09-26T13:01:07.840Z",
-          "updatedAt": "2026-09-26T13:01:07.840Z",
+          "createdAt": "2026-09-26T13:20:59.829Z",
+          "updatedAt": "2026-09-26T13:20:59.829Z",
           "__v": 0
         },
         {
-          "_id": "6ab7c212c7e98f49b829056d",
-          "user_id": "6ab7c212c7e98f49b8290561",
+          "_id": "6ab7c67db399d1bec07aa6e3",
+          "user_id": "6ab7c67db399d1bec07aa6d7",
           "kos_id": {
             "koordinat": {
               "latitude": -7.7654,
               "longitude": 110.3725
             },
-            "_id": "6ab7c212c7e98f49b8290565",
+            "_id": "6ab7c67db399d1bec07aa6db",
             "nama": "Kos Singgah Eksklusif Pogung Tipe A",
             "deskripsi": "Kos putra eksklusif dengan fasilitas lengkap, berjarak hanya 5 menit jalan kaki dari Fakultas Teknik UGM. Lingkungan tenang, aman, dan dekat dengan berbagai tempat makan.",
             "alamat": "Jl. Pogung Kidul No. 42B, Sinduadi, Mlati, Sleman",
@@ -552,20 +552,20 @@
             "jumlah_kamar_tersedia": 3,
             "status_verifikasi": "approved",
             "catatan_verifikasi": "Data dan izin operasional kos telah diverifikasi oleh Admin.",
-            "diverifikasi_oleh": "6ab7c212c7e98f49b829055b",
-            "diverifikasi_pada": "2026-09-26T13:01:06.934Z",
+            "diverifikasi_oleh": "6ab7c67cb399d1bec07aa6d1",
+            "diverifikasi_pada": "2026-09-26T13:19:57.222Z",
             "pemilik_id": {
-              "_id": "6ab7c212c7e98f49b829055d",
+              "_id": "6ab7c67cb399d1bec07aa6d3",
               "nama": "Pemilik Kos Satu",
               "email": "pemilik1@gmail.com",
               "nomor_telepon": "081298765432"
             },
             "__v": 0,
-            "createdAt": "2026-09-26T13:01:06.938Z",
-            "updatedAt": "2026-09-26T13:01:06.938Z"
+            "createdAt": "2026-09-26T13:19:57.226Z",
+            "updatedAt": "2026-09-26T13:19:57.226Z"
           },
-          "createdAt": "2026-09-26T13:01:06.941Z",
-          "updatedAt": "2026-09-26T13:01:06.941Z",
+          "createdAt": "2026-09-26T13:19:57.267Z",
+          "updatedAt": "2026-09-26T13:19:57.267Z",
           "__v": 0
         }
       ]
@@ -578,7 +578,7 @@
     "endpoint": "/api/inquiries",
     "access": "Private (Pencari)",
     "reqBody": {
-      "kos_id": "6ab7c2130e8457a15d7f3b5d",
+      "kos_id": "6ab7c6bbb42b69d3b1862b47",
       "pesan": "Permisi, apakah untuk kamar mandi dalam ada fasilitas air panas?"
     },
     "resStatus": 201,
@@ -586,15 +586,15 @@
       "success": true,
       "message": "Pesan pertanyaan berhasil dikirim ke pemilik kos",
       "data": {
-        "pencari_id": "6ab7c212c7e98f49b8290561",
-        "pemilik_id": "6ab7c212c7e98f49b829055d",
-        "kos_id": "6ab7c2130e8457a15d7f3b5d",
+        "pencari_id": "6ab7c67db399d1bec07aa6d7",
+        "pemilik_id": "6ab7c67cb399d1bec07aa6d3",
+        "kos_id": "6ab7c6bbb42b69d3b1862b47",
         "pesan": "Permisi, apakah untuk kamar mandi dalam ada fasilitas air panas?",
         "balasan": "",
         "status": "menunggu",
-        "_id": "6ab7c2130e8457a15d7f3b76",
-        "createdAt": "2026-09-26T13:01:07.849Z",
-        "updatedAt": "2026-09-26T13:01:07.849Z",
+        "_id": "6ab7c6bcb42b69d3b1862b60",
+        "createdAt": "2026-09-26T13:21:00.037Z",
+        "updatedAt": "2026-09-26T13:21:00.037Z",
         "__v": 0
       }
     }
@@ -603,7 +603,7 @@
     "no": 12,
     "title": "Pemilik Kos Membalas Pertanyaan dari Pencari",
     "method": "PATCH",
-    "endpoint": "/api/inquiries/6ab7c2130e8457a15d7f3b76/reply",
+    "endpoint": "/api/inquiries/6ab7c6bcb42b69d3b1862b60/reply",
     "access": "Private (Pemilik)",
     "reqBody": {
       "balasan": "Iya betul, di setiap kamar mandi dalam sudah dilengkapi water heater."
@@ -613,15 +613,15 @@
       "success": true,
       "message": "Balasan pesan berhasil dikirim",
       "data": {
-        "_id": "6ab7c2130e8457a15d7f3b76",
-        "pencari_id": "6ab7c212c7e98f49b8290561",
-        "pemilik_id": "6ab7c212c7e98f49b829055d",
-        "kos_id": "6ab7c2130e8457a15d7f3b5d",
+        "_id": "6ab7c6bcb42b69d3b1862b60",
+        "pencari_id": "6ab7c67db399d1bec07aa6d7",
+        "pemilik_id": "6ab7c67cb399d1bec07aa6d3",
+        "kos_id": "6ab7c6bbb42b69d3b1862b47",
         "pesan": "Permisi, apakah untuk kamar mandi dalam ada fasilitas air panas?",
         "balasan": "Iya betul, di setiap kamar mandi dalam sudah dilengkapi water heater.",
         "status": "dibalas",
-        "createdAt": "2026-09-26T13:01:07.849Z",
-        "updatedAt": "2026-09-26T13:01:07.852Z",
+        "createdAt": "2026-09-26T13:21:00.037Z",
+        "updatedAt": "2026-09-26T13:21:00.136Z",
         "__v": 0
       }
     }
@@ -662,7 +662,7 @@
     "access": "Private (Admin)",
     "reqBody": null,
     "resStatus": 200,
-    "resBody": "ID,Nama Kos,Tipe,Harga Per Bulan,Kamar Tersedia,Kamar Total,Status Verifikasi,Area Kampus,Alamat,Nama Pemilik,Kontak Pemilik\n6ab7c212c7e98f49b8290565,\"Kos Singgah Eksklusif Pogung Tipe A\",putra,1650000,3,10,approved,Pogung UGM,\"Jl. Pogung Kidul No. 42B, Sinduadi, Mlati, Sleman\",\"Pemilik Kos Satu\",\"0..."
+    "resBody": "ID,Nama Kos,Tipe,Harga Per Bulan,Kamar Tersedia,Kamar Total,Status Verifikasi,Area Kampus,Alamat,Nama Pemilik,Kontak Pemilik\n6ab7c67db399d1bec07aa6db,\"Kos Singgah Eksklusif Pogung Tipe A\",putra,1650000,3,10,approved,Pogung UGM,\"Jl. Pogung Kidul No. 42B, Sinduadi, Mlati, Sleman\",\"Pemilik Kos Satu\",\"0..."
   },
   {
     "no": 15,
