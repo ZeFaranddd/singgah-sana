@@ -1,0 +1,300 @@
+{
+  "info": {
+    "name": "Singgah-sana RESTful API - Portal Kos-Kosan Terverifikasi",
+    "description": "Koleksi Postman resmi untuk pengujian backend Singgah-sana (Tugas Akhir PAW DTETI FT UGM 2026/2027)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Autentikasi & Akun",
+      "item": [
+        {
+          "name": "1.1 Registrasi Akun Pencari",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Pencari Baru\",\n  \"email\": \"pencari.baru@gmail.com\",\n  \"password\": \"PencariPassword123!\",\n  \"nomor_telepon\": \"081234567800\",\n  \"role\": \"pencari\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "1.2 Login Administrator (Simpan Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.success && json.data.token) {",
+                  "    pm.environment.set('adminToken', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"AdminPassword123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "1.3 Login Pemilik Kos (Simpan Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.success && json.data.token) {",
+                  "    pm.environment.set('ownerToken', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pemilik1@gmail.com\",\n  \"password\": \"PemilikPassword123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "1.4 Login Pencari Kos (Simpan Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.success && json.data.token) {",
+                  "    pm.environment.set('seekerToken', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pencari1@gmail.com\",\n  \"password\": \"PencariPassword123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "1.5 Profil Pengguna Login (GET /me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Direktori & Pencarian Kos (Publik)",
+      "item": [
+        {
+          "name": "2.1 Ambil Semua Kos Approved (Publik)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/kos?page=1&limit=10&sort=terbaru",
+              "host": ["{{baseUrl}}"],
+              "path": ["kos"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "terbaru" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.2 Multi-filter (Tipe, Range Harga, Kamar Tersedia)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/kos?tipe=putra&harga_min=1000000&harga_max=2000000&kamar_tersedia=true&sort=harga_asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["kos"],
+              "query": [
+                { "key": "tipe", "value": "putra" },
+                { "key": "harga_min", "value": "1000000" },
+                { "key": "harga_max", "value": "2000000" },
+                { "key": "kamar_tersedia", "value": "true" },
+                { "key": "sort", "value": "harga_asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.3 Pencarian Kata Kunci & Fasilitas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/kos?q=Pogung&fasilitas=AC,WiFi",
+              "host": ["{{baseUrl}}"],
+              "path": ["kos"],
+              "query": [
+                { "key": "q", "value": "Pogung" },
+                { "key": "fasilitas", "value": "AC,WiFi" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Manajemen Kos (Pemilik)",
+      "item": [
+        {
+          "name": "3.1 Daftarkan Kos Baru (Status Otomatis Pending)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Kos Pogung Asri Sejahtera\",\n  \"deskripsi\": \"Kos baru berkonsep minimalis di Pogung Kidul, dekat Fakultas Teknik UGM.\",\n  \"alamat\": \"Jl. Pogung Kidul Gang Melati No. 8, Sinduadi, Sleman\",\n  \"area_kampus\": \"Pogung UGM\",\n  \"latitude\": -7.7658,\n  \"longitude\": 110.3722,\n  \"harga_per_bulan\": 1350000,\n  \"tipe\": \"putra\",\n  \"fasilitas\": [\"AC\", \"WiFi\", \"Kamar Mandi Dalam\", \"Parkir Motor\"],\n  \"jumlah_kamar_total\": 10,\n  \"jumlah_kamar_tersedia\": 3\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/kos", "host": ["{{baseUrl}}"], "path": ["kos"] }
+          }
+        },
+        {
+          "name": "3.2 Lihat Kos Milik Sendiri (My Kos)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/kos/owner/my-kos", "host": ["{{baseUrl}}"], "path": ["kos", "owner", "my-kos"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Verifikasi & Moderasi (Admin)",
+      "item": [
+        {
+          "name": "4.1 Lihat Daftar Kos Menunggu Verifikasi",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/kos?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "kos"],
+              "query": [{ "key": "status", "value": "pending" }]
+            }
+          }
+        },
+        {
+          "name": "4.2 Dashboard Agregasi Statistik",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/admin/stats", "host": ["{{baseUrl}}"], "path": ["admin", "stats"] }
+          }
+        },
+        {
+          "name": "4.3 Ekspor Data Kos ke CSV (Nilai Tambah G6)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/admin/export/kos", "host": ["{{baseUrl}}"], "path": ["admin", "export", "kos"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Favorit (Pencari)",
+      "item": [
+        {
+          "name": "5.1 Lihat Daftar Favorit",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/favorit", "host": ["{{baseUrl}}"], "path": ["favorit"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Komunikasi & Tanya Pemilik (Inquiries)",
+      "item": [
+        {
+          "name": "6.1 Riwayat Pertanyaan Pencari",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/inquiries/my", "host": ["{{baseUrl}}"], "path": ["inquiries", "my"] }
+          }
+        },
+        {
+          "name": "6.2 Pesan Masuk Pemilik Kos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ownerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/inquiries/owner", "host": ["{{baseUrl}}"], "path": ["inquiries", "owner"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Pengujian Pengamanan (Error Cases)",
+      "item": [
+        {
+          "name": "7.1 401 Unauthorized (Tanpa Token)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/admin/stats", "host": ["{{baseUrl}}"], "path": ["admin", "stats"] }
+          }
+        },
+        {
+          "name": "7.2 403 Forbidden (Pencari Mengakses Endpoint Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/admin/stats", "host": ["{{baseUrl}}"], "path": ["admin", "stats"] }
+          }
+        }
+      ]
+    }
+  ]
+}
