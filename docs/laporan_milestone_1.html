@@ -410,7 +410,7 @@
         <td class="toc-page">14</td>
       </tr>
       <tr>
-        <td class="toc-sub">5.8 Pengujian 8: GET /api/kos (Multi-filter Pencarian Mamikos-Style)</td>
+        <td class="toc-sub">5.8 Pengujian 8: GET /api/kos (Pencarian Multifilter Dinamis)</td>
         <td><span class="toc-dots"></span></td>
         <td class="toc-page">14</td>
       </tr>
@@ -461,7 +461,7 @@
     </ol>
 
     <p>
-      Untuk menjawab persoalan tersebut, aplikasi <b>Singgah-sana</b> dibangun sebagai sistem <i>backend</i> RESTful API berbasis <b>Node.js (Express.js)</b> dan basis data <b>MongoDB</b> yang mengadopsi mekanisme direktori terkurasi mirip platform pencarian kos nasional (seperti Mamikos). Sistem ini menengahi pemilik kos dan pencari kos melalui mekanisme kurasi ketat:
+      Untuk menjawab persoalan tersebut, aplikasi <b>Singgah-sana</b> dibangun sebagai sistem <i>backend</i> RESTful API berbasis <b>Node.js (Express.js)</b> dan basis data <b>MongoDB</b> sebagai portal direktori dan pencarian kos-kosan independen yang terverifikasi. Sistem ini menengahi pemilik kos dan pencari kos melalui mekanisme kurasi ketat:
     </p>
     <ul>
       <li><b>Pemilik kos</b> mendaftarkan data properti lengkap dengan foto, titik koordinat peta (latitude/longitude), fasilitas, harga bulanan, dan kuota kamar.</li>
@@ -763,9 +763,9 @@
       <div class="test-meta"><b>Hak Akses:</b> Publik | <b>Fungsi:</b> Pendaftaran akun pencari kos baru dengan enkripsi kata sandi <code>bcryptjs</code>.</div>
       <div style="font-size: 9pt; font-weight: bold; margin-top: 4px;">Request Payload:</div>
       <div class="code-box">{
-  "nama": "Faiz Gymnastiar",
-  "email": "faiz.gymnastiar@mail.ugm.ac.id",
-  "password": "FaizPassword123!",
+  "nama": "Pencari Baru",
+  "email": "pencari.baru@gmail.com",
+  "password": "PencariPassword123!",
   "nomor_telepon": "081234567800",
   "role": "pencari"
 }</div>
@@ -775,8 +775,8 @@
   "message": "Registrasi akun berhasil!",
   "data": {
     "_id": "6ab7b5244e17e0a0159d8299",
-    "nama": "Faiz Gymnastiar",
-    "email": "faiz.gymnastiar@mail.ugm.ac.id",
+    "nama": "Pencari Baru",
+    "email": "pencari.baru@gmail.com",
     "nomor_telepon": "081234567800",
     "role": "pencari",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -797,7 +797,7 @@
       <div class="test-meta"><b>Hak Akses:</b> Publik | <b>Fungsi:</b> Otentikasi Administrator dan penerbitan JSON Web Token (JWT).</div>
       <div style="font-size: 9pt; font-weight: bold; margin-top: 4px;">Request Payload:</div>
       <div class="code-box">{
-  "email": "admin@singgahsana.ugm.ac.id",
+  "email": "admin@gmail.com",
   "password": "AdminPassword123!"
 }</div>
       <div style="font-size: 9pt; font-weight: bold; margin-top: 4px;">Response JSON:</div>
@@ -806,8 +806,8 @@
   "message": "Login berhasil!",
   "data": {
     "_id": "6ab7b5244e17e0a0159d828a",
-    "nama": "Administrator Singgah-sana",
-    "email": "admin@singgahsana.ugm.ac.id",
+    "nama": "Administrator Portal",
+    "email": "admin@gmail.com",
     "role": "admin",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
@@ -830,8 +830,8 @@
   "success": true,
   "data": {
     "_id": "6ab7b5244e17e0a0159d828d",
-    "nama": "Farand Hafiz",
-    "email": "farand.hafiz@mail.ugm.ac.id",
+    "nama": "Pencari Kos Satu",
+    "email": "pencari1@gmail.com",
     "nomor_telepon": "085712345678",
     "role": "pencari"
   }
@@ -963,7 +963,7 @@
       <div class="test-header">
         <div>
           <span class="badge-method badge-get">GET</span>
-          <span>5.8 Pengujian 8: GET /api/kos (Multi-filter Pencarian Mamikos-Style)</span>
+          <span>5.8 Pengujian 8: GET /api/kos (Pencarian Multifilter Dinamis)</span>
         </div>
         <span class="badge-status">Status: 200 OK</span>
       </div>
