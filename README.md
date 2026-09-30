@@ -7,7 +7,7 @@
 
 ## 1. Deskripsi Aplikasi
 
-**Singgah-sana** adalah sistem *backend* RESTful API untuk platform direktori dan pencarian kos-kosan berbasis verifikasi di kawasan sekitar kampus Universitas Gadjah Mada (UGM) dan sekitarnya (seperti Pogung, Karangmalang, Sekip, Blimbingsari, dan Kaliurang). 
+**Singgah-sana** adalah sistem *backend* RESTful API untuk platform direktori dan pencarian kos-kosan terverifikasi di kawasan sekitar kampus Universitas Gadjah Mada (UGM) dan sekitarnya (seperti Pogung, Karangmalang, Sekip, Blimbingsari, dan Kaliurang). 
 
 Aplikasi ini dirancang untuk menyelesaikan permasalahan nyata:
 1. **Pencari Kos**: Informasi ketersediaan kamar yang tersebar secara acak di pamflet gang/grup WhatsApp, tidak tersedianya informasi kuota kamar *real-time*, serta rawannya informasi fiktif/tidak akurat.
