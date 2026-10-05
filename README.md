@@ -160,5 +160,5 @@ npm run test:api
 
 Laporan resmi Tugas Akhir Milestone 1 (Backend) dalam bentuk PDF telah diunggah ke Google Drive dengan akses terbuka (Dapat dilihat oleh siapa saja yang memiliki tautan):
 
-- 🔗 **URL Google Drive**: `https://drive.google.com/drive/folders/1-SINGGAH-SANA-PAW-MILESTONE-1-UGM?usp=sharing` *(Tautan dapat diperbarui saat pengumpulan final)*
+- 🔗 **URL Google Drive**: `https://drive.google.com/file/d/1wEeL0dHed60de0FaKZRlp5ZrFkv_prK9/view?usp=sharing` 
 - 📄 **Dokumen Lokal**: Dokumen cetak laporan juga tersedia langsung pada direktori repositori: [docs/Laporan_Milestone_1_Singgah_sana.pdf](docs/Laporan_Milestone_1_Singgah_sana.pdf).
