@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+/* Token desain dari variabel Figma "PAW Patrol" (halaman HiFi). */
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Sora Variable', 'Inter Variable', ui-sans-serif, sans-serif;
+
+  --color-brand: #7c3aed;
+  --color-brand-hover: #6d28d9;
+  --color-brand-soft: #f3eefe;
+  --color-brand-ring: #c4b5fd;
+
+  --color-ink: #0f172a;
+  --color-ink-muted: #64748b;
+  --color-ink-subtle: #94a3b8;
+
+  --color-line: #e2e8f0;
+  --color-canvas: #f8fafc;
+
+  --color-success: #15803d;
+  --color-success-soft: #ecfdf3;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fef2f2;
+  --color-warning: #b45309;
+  --color-warning-soft: #fffbeb;
+
+  --radius-card: 24px;
+}
+
+@layer base {
+  html {
+    @apply bg-canvas text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-ring ring-offset-2;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
