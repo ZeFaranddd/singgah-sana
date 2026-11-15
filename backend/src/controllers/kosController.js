@@ -1,6 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const Kos = require('../models/Kos');
 const Favorit = require('../models/Favorit');
 const Inquiry = require('../models/Inquiry');
+const { kirimNotifikasiKeAdmin } = require('../utils/notifikasi');
+const { catatAktivitas } = require('../utils/aktivitas');
 const {
   safeSearchTerm,
   escapeRegex,
@@ -13,8 +17,38 @@ const {
 // agar pemilik tetap bisa memperbarui ketersediaan kamar secara real-time.
 const FIELD_BUTUH_VERIFIKASI_ULANG = [
   'nama', 'deskripsi', 'alamat', 'area_kampus', 'koordinat', 'harga_per_bulan',
-  'tipe', 'fasilitas', 'luas_kamar', 'peraturan', 'jumlah_kamar_total',
+  'tipe', 'fasilitas', 'luas_kamar', 'peraturan', 'jumlah_kamar_total', 'foto',
 ];
+
+const UPLOAD_DIR = path.join(__dirname, '../../uploads');
+const MAKS_FOTO = 5;
+
+// Normalisasi field yang bisa berupa string tunggal, array, atau kosong (multipart/form-data)
+const keArray = (val) => {
+  if (val === undefined || val === null || val === '') return [];
+  return (Array.isArray(val) ? val : [val]).map((v) => String(v).trim()).filter(Boolean);
+};
+
+// Path foto dari berkas yang baru diunggah pada request ini
+const fotoUnggahan = (req) => (req.files || []).map((file) => `/uploads/${file.filename}`);
+
+// Hapus berkas foto lokal (/uploads/...) yang tidak dipakai lagi
+const hapusBerkasFoto = async (daftarFoto = []) => {
+  await Promise.all(
+    daftarFoto
+      .filter((foto) => typeof foto === 'string' && foto.startsWith('/uploads/'))
+      .map(async (foto) => {
+        const filePath = path.join(UPLOAD_DIR, path.basename(foto));
+        try {
+          await fs.promises.unlink(filePath);
+        } catch (error) {
+          if (error.code !== 'ENOENT') {
+            console.error(`[Kos] Gagal menghapus berkas foto ${filePath}: ${error.message}`);
+          }
+        }
+      })
+  );
+};
 
 const getAllKosPublic = async (req, res, next) => {
   try {
@@ -160,6 +194,7 @@ const createKos = async (req, res, next) => {
     } = req.body;
 
     if (!nama || !deskripsi || !alamat || !harga_per_bulan || !tipe || !jumlah_kamar_total) {
+      await hapusBerkasFoto(fotoUnggahan(req));
       return res.status(400).json({
         success: false,
         message: 'Mohon lengkapi field wajib: nama, deskripsi, alamat, harga_per_bulan, tipe, jumlah_kamar_total',
@@ -211,12 +246,30 @@ const createKos = async (req, res, next) => {
       pemilik_id: req.user._id,
     });
 
+    await Promise.all([
+      kirimNotifikasiKeAdmin({
+        tipe: 'kos_menunggu',
+        judul: 'Kos baru menunggu peninjauan',
+        isi: `${kosBaru.nama} didaftarkan oleh ${req.user.nama}.`,
+        tautan: '/admin/peninjauan',
+      }),
+      catatAktivitas({
+        aktor: req.user,
+        aksi: 'kos_diajukan',
+        targetTipe: 'kos',
+        targetId: kosBaru._id,
+        targetLabel: kosBaru.nama,
+        ringkasan: `${req.user.nama} mengajukan kos "${kosBaru.nama}"`,
+      }),
+    ]);
+
     res.status(201).json({
       success: true,
       message: 'Kos berhasil didaftarkan dan sedang menunggu verifikasi oleh Administrator',
       data: kosBaru,
     });
   } catch (error) {
+    await hapusBerkasFoto(fotoUnggahan(req));
     next(error);
   }
 };
@@ -240,10 +293,12 @@ const updateKos = async (req, res, next) => {
     let kos = await Kos.findById(req.params.id);
 
     if (!kos) {
+      await hapusBerkasFoto(fotoUnggahan(req));
       return res.status(404).json({ success: false, message: 'Kos tidak ditemukan' });
     }
 
     if (kos.pemilik_id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      await hapusBerkasFoto(fotoUnggahan(req));
       return res.status(403).json({
         success: false,
         message: 'Akses ditolak: Anda hanya dapat memperbarui kos milik Anda sendiri',
@@ -287,6 +342,34 @@ const updateKos = async (req, res, next) => {
       kos.jumlah_kamar_tersedia = Number(jumlah_kamar_tersedia);
     }
 
+    // Validator Mongoose hanya memeriksa field yang diubah, jadi konsistensi kuota dicek manual
+    if (kos.jumlah_kamar_tersedia > kos.jumlah_kamar_total) {
+      await hapusBerkasFoto(fotoUnggahan(req));
+      return res.status(400).json({
+        success: false,
+        message: 'Kamar tersedia tidak boleh melebihi jumlah kamar total',
+      });
+    }
+
+    // Foto: foto_urls = foto lama yang dipertahankan, berkas baru ikut diunggah lewat field 'foto'
+    const fotoLama = [...(kos.foto || [])];
+    const adaFotoBaru = req.files && req.files.length > 0;
+    if (adaFotoBaru || req.body.foto_urls !== undefined) {
+      const dipertahankan =
+        req.body.foto_urls !== undefined ? keArray(req.body.foto_urls) : fotoLama;
+      const fotoBaru = adaFotoBaru ? req.files.map((file) => `/uploads/${file.filename}`) : [];
+      const gabungan = [...dipertahankan, ...fotoBaru];
+
+      if (gabungan.length === 0) {
+        return res.status(400).json({ success: false, message: 'Kos minimal memiliki satu foto' });
+      }
+      if (gabungan.length > MAKS_FOTO) {
+        await hapusBerkasFoto(fotoBaru);
+        return res.status(400).json({ success: false, message: `Foto kos maksimal ${MAKS_FOTO} berkas` });
+      }
+      kos.foto = gabungan;
+    }
+
     // Pemilik mengubah data penting pada kos yang sudah diverifikasi -> kembali ke antrean verifikasi
     let butuhVerifikasiUlang = false;
     if (req.user.role !== 'admin' && kos.status_verifikasi !== 'pending') {
@@ -301,6 +384,28 @@ const updateKos = async (req, res, next) => {
 
     const updatedKos = await kos.save();
 
+    // Foto lama yang dibuang dihapus dari disk setelah kos berhasil tersimpan
+    await hapusBerkasFoto(fotoLama.filter((foto) => !updatedKos.foto.includes(foto)));
+
+    if (butuhVerifikasiUlang) {
+      await Promise.all([
+        kirimNotifikasiKeAdmin({
+          tipe: 'kos_menunggu',
+          judul: 'Perubahan kos menunggu peninjauan',
+          isi: `${updatedKos.nama} diperbarui oleh pemilik dan perlu ditinjau ulang.`,
+          tautan: '/admin/peninjauan',
+        }),
+        catatAktivitas({
+          aktor: req.user,
+          aksi: 'kos_diajukan_ulang',
+          targetTipe: 'kos',
+          targetId: updatedKos._id,
+          targetLabel: updatedKos.nama,
+          ringkasan: `${req.user.nama} memperbarui kos "${updatedKos.nama}" dan mengajukan tinjauan ulang`,
+        }),
+      ]);
+    }
+
     res.status(200).json({
       success: true,
       message: butuhVerifikasiUlang
@@ -309,6 +414,7 @@ const updateKos = async (req, res, next) => {
       data: updatedKos,
     });
   } catch (error) {
+    await hapusBerkasFoto(fotoUnggahan(req));
     next(error);
   }
 };
@@ -332,7 +438,18 @@ const deleteKos = async (req, res, next) => {
       Favorit.deleteMany({ kos_id: kos._id }),
       Inquiry.deleteMany({ kos_id: kos._id }),
     ]);
+    const namaKos = kos.nama;
+    const idKos = kos._id;
     await kos.deleteOne();
+
+    await catatAktivitas({
+      aktor: req.user,
+      aksi: 'kos_dihapus',
+      targetTipe: 'kos',
+      targetId: idKos,
+      targetLabel: namaKos,
+      ringkasan: `${req.user.nama} menghapus kos "${namaKos}"`,
+    });
 
     res.status(200).json({
       success: true,
@@ -343,7 +460,40 @@ const deleteKos = async (req, res, next) => {
   }
 };
 
+// Ringkasan per area kampus (hanya kos yang sudah disetujui): dipakai untuk "Mulai dari area favoritmu"
+const getAreaStats = async (req, res, next) => {
+  try {
+    const data = await Kos.aggregate([
+      { $match: { status_verifikasi: 'approved' } },
+      {
+        $group: {
+          _id: '$area_kampus',
+          jumlah_kos: { $sum: 1 },
+          kamar_tersedia: { $sum: '$jumlah_kamar_tersedia' },
+          harga_mulai: { $min: '$harga_per_bulan' },
+        },
+      },
+      { $sort: { jumlah_kos: -1, _id: 1 } },
+      { $limit: 12 },
+      {
+        $project: {
+          _id: 0,
+          area_kampus: '$_id',
+          jumlah_kos: 1,
+          kamar_tersedia: 1,
+          harga_mulai: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
+  getAreaStats,
   getAllKosPublic,
   getKosById,
   createKos,

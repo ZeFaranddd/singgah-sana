@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { getJwtSecret } = require('../config/jwt');
+const { catatAktivitas } = require('../utils/aktivitas');
+const { kirimNotifikasi } = require('../utils/notifikasi');
 
 const generateToken = (id, role) => {
   return jwt.sign(
@@ -53,6 +55,24 @@ const register = async (req, res, next) => {
     });
 
     const token = generateToken(user._id, user.role);
+
+    await catatAktivitas({
+      aktor: user,
+      aksi: 'user_terdaftar',
+      targetTipe: 'user',
+      targetId: user._id,
+      targetLabel: user.nama,
+      ringkasan: `${user.nama} mendaftar sebagai ${user.role}`,
+    });
+    await kirimNotifikasi(user._id, {
+      tipe: 'info',
+      judul: 'Selamat datang di Singgah-sana',
+      isi:
+        user.role === 'pemilik'
+          ? 'Akunmu sudah aktif. Daftarkan kos pertamamu agar bisa ditinjau admin.'
+          : 'Akunmu sudah aktif. Mulai jelajahi kos di sekitar kampus.',
+      tautan: user.role === 'pemilik' ? '/pemilik/kos/baru' : '/kos',
+    });
 
     res.status(201).json({
       success: true,
@@ -133,7 +153,7 @@ const getMe = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
   try {
-    const { nama, nomor_telepon, foto_profil } = req.body;
+    const { nama, nomor_telepon, foto_profil, preferensi } = req.body;
 
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -143,6 +163,35 @@ const updateProfile = async (req, res, next) => {
     if (nama) user.nama = nama;
     if (nomor_telepon) user.nomor_telepon = nomor_telepon;
     if (foto_profil) user.foto_profil = foto_profil;
+
+    if (preferensi && typeof preferensi === 'object') {
+      // Memakai user.set() per path agar aman untuk nested path Mongoose
+      if (preferensi.area_kampus !== undefined) {
+        user.set('preferensi.area_kampus', String(preferensi.area_kampus));
+      }
+      if (preferensi.tipe !== undefined) {
+        user.set('preferensi.tipe', String(preferensi.tipe).toLowerCase());
+      }
+      if (preferensi.harga_maks !== undefined) {
+        const harga =
+          preferensi.harga_maks === null || preferensi.harga_maks === ''
+            ? null
+            : Number(preferensi.harga_maks);
+        if (harga !== null && !Number.isFinite(harga)) {
+          return res.status(400).json({ success: false, message: 'Anggaran maksimal harus berupa angka' });
+        }
+        user.set('preferensi.harga_maks', harga);
+      }
+      if (preferensi.fasilitas !== undefined) {
+        const daftar = Array.isArray(preferensi.fasilitas)
+          ? preferensi.fasilitas
+          : String(preferensi.fasilitas).split(',');
+        user.set(
+          'preferensi.fasilitas',
+          daftar.map((f) => String(f).trim()).filter(Boolean).slice(0, 20)
+        );
+      }
+    }
 
     const updatedUser = await user.save();
 
@@ -156,4 +205,52 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile };
+const changePassword = async (req, res, next) => {
+  try {
+    const { password_lama, password_baru } = req.body;
+
+    if (!password_lama || !password_baru) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mohon isi password_lama dan password_baru',
+      });
+    }
+
+    if (String(password_baru).length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kata sandi baru minimal 6 karakter',
+      });
+    }
+
+    if (password_lama === password_baru) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kata sandi baru harus berbeda dari kata sandi lama',
+      });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    const cocok = await user.matchPassword(password_lama);
+    if (!cocok) {
+      return res.status(400).json({ success: false, message: 'Kata sandi lama tidak sesuai' });
+    }
+
+    user.password = password_baru; // di-hash oleh hook pre-save pada User
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Kata sandi berhasil diganti',
+      data: { token: generateToken(user._id, user.role) },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, getMe, updateProfile, changePassword };

@@ -4,6 +4,15 @@ const User = require('../models/User');
 const Kos = require('../models/Kos');
 const Favorit = require('../models/Favorit');
 const Inquiry = require('../models/Inquiry');
+const Notifikasi = require('../models/Notifikasi');
+const Laporan = require('../models/Laporan');
+const Aktivitas = require('../models/Aktivitas');
+
+// Foto contoh memakai berkas bawaan frontend (frontend/public/assets) agar seeder
+// tidak bergantung pada koneksi internet. Dilayani oleh server yang sama pada mode produksi.
+const FOTO_SEED = ['/assets/42ce5.png', '/assets/cdcb4.png', '/assets/423bf.png', '/assets/c8ce8.png'];
+const fotoSeed = (mulai, jumlah = 3) =>
+  Array.from({ length: jumlah }, (_, i) => FOTO_SEED[(mulai + i) % FOTO_SEED.length]);
 
 const seedData = async () => {
   try {
@@ -16,6 +25,9 @@ const seedData = async () => {
     await Kos.deleteMany();
     await Favorit.deleteMany();
     await Inquiry.deleteMany();
+    await Notifikasi.deleteMany();
+    await Laporan.deleteMany();
+    await Aktivitas.deleteMany();
     console.log('[Seeder] Data lama berhasil dibersihkan.');
 
     // 1. Buat Pengguna Bawaan (Menggunakan Nama & Email General)
@@ -74,10 +86,7 @@ const seedData = async () => {
         alamat: 'Jl. Pogung Kidul No. 42B, Sinduadi, Mlati, Sleman',
         area_kampus: 'Pogung UGM',
         koordinat: { latitude: -7.7654, longitude: 110.3725 },
-        foto: [
-          'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80',
-          'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(0),
         harga_per_bulan: 1650000,
         tipe: 'putra',
         fasilitas: ['AC', 'WiFi', 'Kamar Mandi Dalam', 'Water Heater', 'Kasur Springbed', 'Lemari Pakaian', 'Meja Belajar', 'Parkir Motor', 'Parkir Mobil', 'CCTV 24 Jam'],
@@ -97,10 +106,7 @@ const seedData = async () => {
         alamat: 'Jl. Sekip Blok T No. 12, Sendowo, Mlati, Sleman',
         area_kampus: 'Sekip UGM',
         koordinat: { latitude: -7.7698, longitude: 110.3741 },
-        foto: [
-          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80',
-          'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(1),
         harga_per_bulan: 1400000,
         tipe: 'putri',
         fasilitas: ['AC', 'WiFi', 'Kamar Mandi Dalam', 'Dapur Bersama', 'Kulkas Bersama', 'Parkir Motor', 'Penjaga Kos 24 Jam'],
@@ -120,9 +126,7 @@ const seedData = async () => {
         alamat: 'Gang Karangmalang Blok A No. 5, Caturtunggal, Depok, Sleman',
         area_kampus: 'Karangmalang UGM/UNY',
         koordinat: { latitude: -7.7725, longitude: 110.3854 },
-        foto: [
-          'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(2),
         harga_per_bulan: 850000,
         tipe: 'campur',
         fasilitas: ['WiFi', 'Kamar Mandi Luar', 'Kasur Busa', 'Lemari', 'Parkir Motor', 'Dapur Bersama'],
@@ -142,9 +146,7 @@ const seedData = async () => {
         alamat: 'Jl. Pogung Baru Blok F No. 19, Sinduadi, Mlati, Sleman',
         area_kampus: 'Pogung Baru UGM',
         koordinat: { latitude: -7.7612, longitude: 110.3708 },
-        foto: [
-          'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(3),
         harga_per_bulan: 2100000,
         tipe: 'putra',
         fasilitas: ['AC', 'WiFi', 'Kamar Mandi Dalam', 'Water Heater', 'Smart TV', 'Kulkas Kamar', 'Laundry Gratis', 'Parkir Mobil', 'Parkir Motor'],
@@ -164,9 +166,7 @@ const seedData = async () => {
         alamat: 'Jl. Kaliurang KM 5.2 Gang Bougenville No. 8, Caturtunggal, Depok, Sleman',
         area_kampus: 'Kaliurang UGM',
         koordinat: { latitude: -7.7633, longitude: 110.3802 },
-        foto: [
-          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(4),
         harga_per_bulan: 950000,
         tipe: 'putri',
         fasilitas: ['WiFi', 'Kamar Mandi Dalam', 'Kasur', 'Lemari', 'Parkir Motor'],
@@ -186,9 +186,7 @@ const seedData = async () => {
         alamat: 'Jl. Pogung Raya No. 99, Sinduadi, Mlati, Sleman',
         area_kampus: 'Pogung UGM',
         koordinat: { latitude: -7.7645, longitude: 110.3719 },
-        foto: [
-          'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(5),
         harga_per_bulan: 1250000,
         tipe: 'putra',
         fasilitas: ['AC', 'WiFi', 'Kamar Mandi Dalam', 'Parkir Motor'],
@@ -205,9 +203,7 @@ const seedData = async () => {
         alamat: 'Jl. Monjali Gang Melati No. 3, Sleman',
         area_kampus: 'Monjali',
         koordinat: { latitude: -7.7550, longitude: 110.3680 },
-        foto: [
-          'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
-        ],
+        foto: fotoSeed(6),
         harga_per_bulan: 600000,
         tipe: 'campur',
         fasilitas: ['Kamar Mandi Luar', 'Parkir Motor'],
@@ -242,7 +238,96 @@ const seedData = async () => {
       status: 'dibalas',
     });
 
-    console.log('[Seeder] Data favorit dan inquiry contoh berhasil dibuat.');
+    // Satu pertanyaan yang masih menunggu balasan (untuk mencoba fitur balas pesan pemilik)
+    await Inquiry.create({
+      pencari_id: pencari2._id,
+      pemilik_id: pemilik2._id,
+      kos_id: insertedKos[1]._id, // Griya Putri Sekip
+      pesan: 'Halo, apakah kamar di lantai 1 masih kosong dan boleh membawa kulkas kecil sendiri?',
+      status: 'menunggu',
+    });
+
+    // 5. Laporan pengguna contoh (untuk menu Laporan admin)
+    await Laporan.create({
+      pelapor_id: pencari2._id,
+      kos_id: insertedKos[4]._id,
+      kos_nama: insertedKos[4].nama,
+      alasan: 'kamar_sudah_penuh',
+      deskripsi: 'Di iklan tertulis ada kamar kosong, tetapi saat saya hubungi pemilik bilang semua kamar sudah terisi.',
+      status: 'terbuka',
+    });
+
+    // 6. Notifikasi contoh untuk tiap peran
+    await Notifikasi.insertMany([
+      {
+        user_id: pencari1._id,
+        tipe: 'balasan_pesan',
+        judul: 'Pemilik Kos Satu membalas pertanyaanmu',
+        isi: 'Kos Singgah Eksklusif Pogung: Siang, masih ada. Silakan datang besok jam 16:00 ya.',
+        tautan: '/pencari/pesan',
+      },
+      {
+        user_id: pemilik1._id,
+        tipe: 'kos_menunggu',
+        judul: 'Kos Pogung Raya Indah sedang ditinjau admin',
+        isi: 'Pengajuanmu akan diperiksa admin sebelum tayang di pencarian.',
+        tautan: '/pemilik/kos',
+      },
+      {
+        user_id: pemilik1._id,
+        tipe: 'kos_ditolak',
+        judul: 'Griya Melati Monjali perlu diperbaiki',
+        isi: insertedKos[6].catatan_verifikasi,
+        tautan: '/pemilik/kos',
+      },
+      {
+        user_id: pemilik2._id,
+        tipe: 'pesan_baru',
+        judul: 'Pencari Kos Dua menanyakan Griya Putri Sekip UGM Asri',
+        isi: 'Halo, apakah kamar di lantai 1 masih kosong dan boleh membawa kulkas kecil sendiri?',
+        tautan: '/pemilik/pesan',
+      },
+      {
+        user_id: admin._id,
+        tipe: 'kos_menunggu',
+        judul: 'Kos baru menunggu peninjauan',
+        isi: 'Kos Pogung Raya Indah (Menunggu Verifikasi) didaftarkan oleh Pemilik Kos Satu.',
+        tautan: '/admin/peninjauan',
+      },
+      {
+        user_id: admin._id,
+        tipe: 'laporan_baru',
+        judul: 'Laporan baru: Wisma Bougenville Kaliurang',
+        isi: 'Di iklan tertulis ada kamar kosong, tetapi saat saya hubungi pemilik bilang semua kamar sudah terisi.',
+        tautan: '/admin/laporan',
+      },
+    ]);
+
+    // 7. Riwayat aktivitas contoh (untuk menu Aktivitas admin)
+    await Aktivitas.insertMany([
+      {
+        aktor_id: pemilik1._id, aktor_nama: pemilik1.nama, aktor_role: 'pemilik',
+        aksi: 'kos_diajukan', target_tipe: 'kos', target_id: insertedKos[5]._id, target_label: insertedKos[5].nama,
+        ringkasan: `${pemilik1.nama} mengajukan kos "${insertedKos[5].nama}"`,
+      },
+      {
+        aktor_id: admin._id, aktor_nama: admin.nama, aktor_role: 'admin',
+        aksi: 'kos_ditolak', target_tipe: 'kos', target_id: insertedKos[6]._id, target_label: insertedKos[6].nama,
+        ringkasan: `${admin.nama} menolak kos "${insertedKos[6].nama}"`,
+      },
+      {
+        aktor_id: admin._id, aktor_nama: admin.nama, aktor_role: 'admin',
+        aksi: 'kos_disetujui', target_tipe: 'kos', target_id: insertedKos[0]._id, target_label: insertedKos[0].nama,
+        ringkasan: `${admin.nama} menyetujui kos "${insertedKos[0].nama}"`,
+      },
+      {
+        aktor_id: pencari2._id, aktor_nama: pencari2.nama, aktor_role: 'pencari',
+        aksi: 'laporan_dibuat', target_tipe: 'laporan', target_label: insertedKos[4].nama,
+        ringkasan: `${pencari2.nama} melaporkan kos "${insertedKos[4].nama}"`,
+      },
+    ]);
+
+    console.log('[Seeder] Data favorit, inquiry, laporan, notifikasi, dan aktivitas contoh berhasil dibuat.');
     console.log('===========================================================');
     console.log('🎉 SEEDING SELESAI DENGAN SUKSES!');
     console.log('Akun Bawaan (General) untuk Pengujian:');

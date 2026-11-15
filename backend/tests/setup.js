@@ -15,6 +15,9 @@ require('../src/models/User');
 require('../src/models/Kos');
 require('../src/models/Favorit');
 require('../src/models/Inquiry');
+require('../src/models/Notifikasi');
+require('../src/models/Laporan');
+require('../src/models/Aktivitas');
 
 let mongoServer;
 

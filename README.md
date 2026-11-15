@@ -1,168 +1,109 @@
 # Singgah-sana: Portal Kos-Kosan Terverifikasi
 
-> **Tugas Akhir Milestone 1 (Backend) — Mata Kuliah Pengembangan Aplikasi Web (PAW)**  
-> **Departemen Teknik Elektro dan Teknologi Informasi, Fakultas Teknik, Universitas Gadjah Mada (2026/2027)**
+> Tugas Akhir Pengembangan Aplikasi Web (PAW) — Departemen Teknik Elektro dan Teknologi Informasi, Fakultas Teknik, Universitas Gadjah Mada (2026/2027)
+
+Satu proyek utuh: **backend** REST API (Express + MongoDB) dan **frontend** (React + Vite + Tailwind) yang sudah terhubung. Di mode produksi, backend menyajikan hasil build frontend, jadi seluruh aplikasi berjalan dari satu alamat (`http://localhost:5000`).
+
+**Anggota kelompok:** Farand Hafiz, Stella Florencia Doulim, Faiz Gymnastiar Wibawa, Aurelia Mutiah Raudyatuzzahra.
 
 ---
 
-## 1. Deskripsi Aplikasi
+## 1. Menjalankan
 
-**Singgah-sana** adalah sistem *backend* RESTful API untuk platform direktori dan pencarian kos-kosan terverifikasi di kawasan sekitar kampus Universitas Gadjah Mada (UGM) dan sekitarnya (seperti Pogung, Karangmalang, Sekip, Blimbingsari, dan Kaliurang). 
+Prasyarat: **Node.js 18+** dan **MongoDB** (lokal di `127.0.0.1:27017` atau URI MongoDB Atlas).
 
-Aplikasi ini dirancang untuk menyelesaikan permasalahan nyata:
-1. **Pencari Kos**: Informasi ketersediaan kamar yang tersebar secara acak di pamflet gang/grup WhatsApp, tidak tersedianya informasi kuota kamar *real-time*, serta rawannya informasi fiktif/tidak akurat.
-2. **Pemilik Kos**: Beban promosi manual dan repot menerima pesan/telepon terus-menerus menanyakan kamar yang sebenarnya sudah penuh terisi.
-
-### Mekanisme Solusi Sistem
-- **Kurasi & Verifikasi Admin**: Setiap kos baru yang didaftarkan pemilik tidak langsung tampil ke publik (*pending*), melainkan diverifikasi terlebih dahulu oleh Administrator untuk menjamin keabsahan data (*approval workflow*).
-- **Pencarian Multifilter Dinamis**: Pencari kos dapat menyaring direktori berdasarkan kata kunci, tipe (putra/putri/campur), rentang tarif (harga minimum & maksimum), fasilitas lengkap (AC, WiFi, kamar mandi dalam, parkir), serta ketersediaan kamar (`kamar_tersedia=true`).
-- **Personalisasi & Komunikasi Langsung**: Pencari kos dapat menandai kos favorit (*bookmark*) serta mengirim pesan pertanyaan (*inquiry*) langsung kepada pemilik kos terkait.
-
----
-
-## 2. Identitas Kelompok & Anggota
-
-**Nama Kelompok / Proyek**: Singgah-sana  
-**User Story Terpilih**: US2 — *Portal kos-kosan: direktori dan pencarian dengan verifikasi*
-
-### Daftar Anggota Kelompok:
-| No | Nama Lengkap | NIM | Peran Utama |
-|:--:|---|:--:|---|
-| 1 | **Farand Hafiz** | 24/540618/TK/60027 | Backend Architecture & Core Kos Management |
-| 2 | **Stella Florencia Doulim** | 24/542739/TK/60285 | Authentication, JWT Security & RBAC |
-| 3 | **Faiz Gymnastiar Wibawa** | 24/537851/TK/59634 | Inquiry System, Favorit & Postman Testing |
-| 4 | **Aurelia Mutiah Raudyatuzzahra** | 24/534903/TK/59310 | Admin Verification Workflow & Reporting/Export |
-
----
-
-## 3. Struktur Folder dan File Proyek
-
-```text
-singgah-sana/
-├── backend/                                     # Server Backend RESTful API
-│   ├── src/
-│   │   ├── config/                              # Konfigurasi Koneksi Database
-│   │   │   └── db.js                            # Koneksi Mongoose ke MongoDB
-│   │   ├── controllers/                         # Logic Handler Request & Response
-│   │   │   ├── adminController.js               # Verifikasi kos, metrik agregasi, ekspor CSV
-│   │   │   ├── authController.js                # Registrasi, login JWT, dan profil pengguna
-│   │   │   ├── favoritController.js             # Pengelolaan bookmark kos favorit
-│   │   │   ├── inquiryController.js             # Pengiriman & balasan pesan pertanyaan
-│   │   │   └── kosController.js                 # CRUD kos, filter publik, update kuota kamar
-│   │   ├── middlewares/                         # Middleware Express
-│   │   │   ├── authMiddleware.js                # Verifikasi token JWT Bearer
-│   │   │   ├── errorMiddleware.js               # Penanganan galat global & 404 handler
-│   │   │   ├── roleMiddleware.js                # Otorisasi hak akses (RBAC: Admin, Pemilik, Pencari)
-│   │   │   └── uploadMiddleware.js              # Penanganan unggah foto kos menggunakan Multer
-│   │   ├── models/                              # Skema Basis Data Mongoose
-│   │   │   ├── Favorit.js                       # Relasi bookmark pencari ke kos (Compound Index)
-│   │   │   ├── Inquiry.js                       # Pesan komunikasi pencari ke pemilik kos
-│   │   │   ├── Kos.js                           # Entitas properti kos lengkap (lokasi, harga, kamar)
-│   │   │   └── User.js                          # Entitas pengguna (bcrypt hashing pre-save)
-│   │   ├── routes/                              # Definisi Endpoint REST API
-│   │   │   ├── adminRoutes.js                   # Prefix: /api/admin
-│   │   │   ├── authRoutes.js                    # Prefix: /api/auth
-│   │   │   ├── favoritRoutes.js                 # Prefix: /api/favorit
-│   │   │   ├── inquiryRoutes.js                 # Prefix: /api/inquiries
-│   │   │   └── kosRoutes.js                     # Prefix: /api/kos
-│   │   ├── utils/
-│   │   │   └── seeder.js                        # Script pembuat data awal realistis kawasan UGM
-│   │   └── app.js                               # Inisialisasi Express & mounting routing
-│   ├── uploads/                                 # Direktori lokal penyimpanan unggahan berkas foto
-│   ├── .env.example                             # Contoh konfigurasi environment
-│   ├── package.json                             # Manajemen dependensi dan skrip proyek
-│   ├── server.js                                # Entrypoint listener server backend
-│   └── test_runner.js                           # Automated runner pengujian seluruh endpoint API
-├── docs/                                        # Berkas Laporan Resmi Tugas Akhir
-│   ├── Laporan_Milestone_1_Singgah_sana.pdf     # Laporan PDF resmi bersampul logo UGM
-│   ├── laporan_milestone_1.html                 # Dokumen HTML cetak laporan (print-ready)
-│   └── logo_ugm.png                             # Lambang resmi Universitas Gadjah Mada
-├── postman/                                     # Koleksi & Environment Pengujian Postman
-│   ├── Singgah_Sana_API.postman_collection.json
-│   └── Singgah_Sana_Environment.postman_environment.json
-├── .gitignore                                   # File pengabaian git (node_modules, .env, dll)
-└── README.md                                    # Dokumentasi repositori proyek
+```bash
+npm run install:all     # pasang dependensi backend + frontend
+npm run setup           # buat backend/.env dengan JWT_SECRET acak (tidak menimpa .env yang ada)
+npm run seed            # isi data contoh (menghapus data lama di database tersebut)
+npm run build           # build frontend ke frontend/dist
+npm start               # jalankan server -> http://localhost:5000
 ```
 
----
+Bila memakai Atlas / port lain, ubah `MONGO_URI` / `PORT` di `backend/.env`. Build frontend harus ada **sebelum** `npm start` agar halaman web ikut disajikan.
 
-## 4. Teknologi yang Digunakan
+### Mode pengembangan (hot reload)
 
-| Kategori | Teknologi | Deskripsi Penggunaan |
+```bash
+npm run dev:backend     # terminal 1 -> API di :5000
+npm run dev:frontend    # terminal 2 -> web di http://localhost:5173 (proxy /api & /uploads ke :5000)
+```
+
+Pada mode ini halaman Masuk menampilkan tombol isi-otomatis untuk akun seeder.
+
+### Akun dari seeder
+
+| Peran | Email | Kata sandi |
 |---|---|---|
-| **Runtime Environment** | **Node.js (v20+)** | Lingkungan eksekusi kode JavaScript pada sisi *server*. |
-| **Web Framework** | **Express.js (v4.19)** | *Framework* minimalis untuk arsitektur RESTful API, *routing*, dan *middleware*. |
-| **Basis Data** | **MongoDB (v7.0+)** | Basis data NoSQL berorientasi dokumen untuk fleksibilitas penyimpanan data kos. |
-| **Object Data Modeling (ODM)** | **Mongoose (v8.3)** | Pemodelan skema data, validasi tipe, pengindeksan, dan agregasi data. |
-| **Otentikasi & Keamanan** | **JSON Web Token (JWT)** | Mekanisme otentikasi *stateless* berbasis *token* Bearer. |
-| **Enkripsi Sandi** | **bcryptjs** | *Hashing* kata sandi menggunakan *salt rounds* (10 putaran) sebelum disimpan. |
-| **Otorisasi (RBAC)** | **Custom RBAC Middleware** | Pembatasan akses berbasis peran (*Admin*, *Pemilik*, dan *Pencari*). |
-| **Penanganan Berkas** | **Multer** | *Middleware* pemrosesan *multipart/form-data* untuk unggah foto kos (limit 5MB). |
-| **Alat Pengujian** | **Postman** | *Tool* pengujian HTTP API, variabel lingkungan otomatis, dan dokumentasi respon. |
+| Admin | `admin@gmail.com` | `AdminPassword123!` |
+| Pemilik | `pemilik1@gmail.com` / `pemilik2@gmail.com` | `PemilikPassword123!` |
+| Pencari | `pencari1@gmail.com` / `pencari2@gmail.com` | `PencariPassword123!` |
+
+> Ganti semua kata sandi ini bila aplikasi dipasang di server yang bisa diakses publik.
 
 ---
 
-## 5. Panduan Instalasi dan Menjalankan Server
+## 2. Peta fitur per peran
 
-### 1. Prasyarat Sistem
-- **Node.js** (versi 18 ke atas)
-- **MongoDB** lokal yang sedang berjalan di `mongodb://127.0.0.1:27017` atau URI MongoDB Atlas.
+Setiap menu di antarmuka terhubung ke endpoint nyata dan database.
 
-### 2. Langkah Instalasi
-Kloning repositori dan masuk ke folder `backend`:
-```bash
-git clone https://github.com/ZeFaranddd/singgah-sana.git
-cd singgah-sana/backend
-npm install
-```
+**Publik**
+- **Beranda**: pencarian (lokasi/tipe/anggaran), kos pilihan, area favorit (dihitung dari data), rekomendasi sesuai preferensi.
+- **Jelajah kos**: filter kata kunci, tipe, area, rentang harga, fasilitas, ketersediaan kamar, urutan, paginasi. Semua filter tersimpan di URL.
+- **Detail kos**: galeri, ketersediaan, fasilitas, aturan, peta lokasi (OpenStreetMap), WhatsApp pemilik, tanya pemilik, jadwalkan survei, favorit, laporkan kos.
+- **Masuk / Daftar** dengan JWT; sesi dipulihkan dari token.
 
-### 3. Konfigurasi Variabel Lingkungan (`.env`)
-Salin file `.env.example` menjadi `.env` di dalam direktori `backend/`:
-```env
-PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb://127.0.0.1:27017/singgah_sana_db
-JWT_SECRET=<isi_dengan_string_acak_panjang>
-JWT_EXPIRES_IN=7d
-BASE_URL=http://localhost:5000
-```
-> **Penting:** `JWT_SECRET` wajib diisi; server tidak akan berjalan tanpanya. Buat nilai acak dengan:
-> ```bash
-> node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-> ```
+**Pencari**: Ringkasan · Favorit · Pesan (balasan pemilik) · Notifikasi · Profil · Keamanan (ganti sandi) · Preferensi.
 
-### 4. Menjalankan Database Seeder
-Jalankan perintah berikut di dalam folder `backend/` untuk mengisi data awal akun dan kos contoh:
-```bash
-npm run seed
-```
-> **Akun Bawaan (General) untuk Pengujian:**
-> - **Admin**: `admin@gmail.com` / `AdminPassword123!`
-> - **Pemilik**: `pemilik1@gmail.com` / `PemilikPassword123!`
-> - **Pencari**: `pencari1@gmail.com` / `PencariPassword123!`
+**Pemilik**: Ringkasan · Kos saya (status verifikasi, ubah cepat jumlah kamar tersedia, ubah, hapus) · Tambah/ubah kos (wizard 6 langkah + unggah foto) · Pesan (balas pertanyaan) · Notifikasi · Profil · Keamanan.
 
-### 5. Menjalankan Server Backend
-- Mode Pengembangan (dengan *auto-reload* nodemon):
-  ```bash
-  npm run dev
-  ```
-- Mode Produksi:
-  ```bash
-  npm start
-  ```
-Server akan aktif di: `http://localhost:5000/api`
+**Admin**: Ringkasan · Peninjauan (setujui/tolak dengan catatan) · Semua kos (cari, filter, turunkan, hapus, ekspor CSV) · Pengguna · Laporan (proses/selesai/tolak, turunkan kos) · Aktivitas (riwayat audit) · Notifikasi · Akun.
 
-### 6. Menjalankan Otomasi Pengujian API
-Untuk menguji seluruh endpoint secara terotomasi dan memverifikasi status respon (200, 201, 401, 403):
-```bash
-npm run test:api
-```
+Akses dibatasi per peran di dua lapis: guard di frontend dan RBAC di backend.
 
 ---
 
-## 6. URL Google Drive Laporan
+## 3. Yang ditambahkan pada backend
 
-Laporan resmi Tugas Akhir Milestone 1 (Backend) dalam bentuk PDF telah diunggah ke Google Drive dengan akses terbuka (Dapat dilihat oleh siapa saja yang memiliki tautan):
+Backend asli (auth, kos, favorit, inquiry, admin) dipertahankan. Untuk melengkapi menu di desain, ditambahkan:
 
-- 🔗 **URL Google Drive**: `https://drive.google.com/file/d/1wEeL0dHed60de0FaKZRlp5ZrFkv_prK9/view?usp=sharing` 
-- 📄 **Dokumen Lokal**: Dokumen cetak laporan juga tersedia langsung pada direktori repositori: [docs/Laporan_Milestone_1_Singgah_sana.pdf](docs/Laporan_Milestone_1_Singgah_sana.pdf).
+| Endpoint | Peran | Fungsi |
+|---|---|---|
+| `PUT /api/auth/password` | semua | ganti kata sandi |
+| `PUT /api/auth/profile` | semua | kini juga menyimpan `preferensi` |
+| `GET /api/kos/meta/area` | publik | ringkasan per area kampus |
+| `PUT /api/kos/:id` | pemilik/admin | kini menerima foto (multipart), `foto_urls` = foto lama yang dipertahankan; memeriksa kuota ≤ total |
+| `GET /api/notifikasi`, `/jumlah` | semua | daftar & jumlah belum dibaca |
+| `PATCH /api/notifikasi/:id/baca`, `/baca-semua` · `DELETE /api/notifikasi/:id` | semua | kelola notifikasi |
+| `POST /api/laporan`, `GET /api/laporan/my` | pencari | laporan pengguna atas kos |
+| `GET /api/admin/laporan` · `PATCH /api/admin/laporan/:id` | admin | tinjau & tangani laporan |
+| `GET /api/admin/aktivitas` | admin | riwayat aktivitas |
+| `GET /api/admin/stats` | admin | kini memuat ringkasan `laporan` |
+
+Notifikasi dibuat otomatis: pertanyaan baru → pemilik; balasan → pencari; kos diajukan/diubah/laporan baru → admin; kos disetujui/ditolak → pemilik; laporan ditangani → pelapor.
+
+Model baru: `Notifikasi`, `Laporan`, `Aktivitas`; `User` mendapat field `preferensi`. Seeder juga memakai foto bawaan frontend sehingga data contoh tampil tanpa internet.
+
+---
+
+## 4. Struktur
+
+```
+singgah-sana/
+├── backend/            Express API, model Mongoose, tes Jest, seeder
+├── frontend/           React + Vite + Tailwind (src/lib: API, auth, router; src/pages per peran)
+├── docs/  postman/     laporan Milestone 1 dan koleksi Postman (belum memuat endpoint baru)
+├── scripts/setup-env.js
+└── package.json        skrip gabungan
+```
+
+Pengujian backend: `npm test` (Jest + mongodb-memory-server). Berkas `backend/tests/fitur.lanjutan.test.js` mencakup fitur baru.
+
+---
+
+## 5. Catatan
+
+- Sesi bersifat stateless (JWT 7 hari). Token lama tetap berlaku sampai kedaluwarsa walau kata sandi diganti.
+- "Jadwalkan survei" dikirim sebagai pesan (inquiry) berisi tanggal dan jam; satu pencari hanya boleh punya satu pesan yang menunggu balasan per kos (aturan backend asli).
+- Foto unggahan disimpan di `backend/uploads` (disk lokal). Untuk hosting yang disknya tidak persisten, pindahkan ke penyimpanan objek.
+- Font Inter dan Sora dimuat dari Google Fonts; tanpa internet tampilan memakai font sistem.

@@ -1,5 +1,6 @@
 const Inquiry = require('../models/Inquiry');
 const Kos = require('../models/Kos');
+const { kirimNotifikasi } = require('../utils/notifikasi');
 
 const PESAN_INQUIRY_DUPLIKAT =
   'Anda masih memiliki pertanyaan yang menunggu balasan untuk kos ini. Mohon tunggu balasan pemilik sebelum mengirim pertanyaan baru';
@@ -46,6 +47,13 @@ const sendInquiry = async (req, res, next) => {
       kos_id,
       pesan,
       status: 'menunggu',
+    });
+
+    await kirimNotifikasi(kos.pemilik_id, {
+      tipe: 'pesan_baru',
+      judul: `${req.user.nama} menanyakan ${kos.nama}`,
+      isi: pesan.slice(0, 200),
+      tautan: '/pemilik/pesan',
     });
 
     res.status(201).json({
@@ -145,6 +153,14 @@ const replyInquiry = async (req, res, next) => {
     inquiry.balasan = balasan;
     inquiry.status = 'dibalas';
     const updated = await inquiry.save();
+
+    const kosTerkait = await Kos.findById(inquiry.kos_id).select('nama');
+    await kirimNotifikasi(inquiry.pencari_id, {
+      tipe: 'balasan_pesan',
+      judul: `${req.user.nama} membalas pertanyaanmu`,
+      isi: `${kosTerkait ? kosTerkait.nama + ': ' : ''}${balasan.slice(0, 180)}`,
+      tautan: '/pencari/pesan',
+    });
 
     res.status(200).json({
       success: true,

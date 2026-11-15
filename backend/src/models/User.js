@@ -43,6 +43,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
     },
+    // Preferensi pencarian kos (dipakai pencari untuk rekomendasi & pengisian filter otomatis)
+    preferensi: {
+      area_kampus: { type: String, default: '', trim: true, maxlength: 80 },
+      tipe: {
+        type: String,
+        enum: { values: ['', 'putra', 'putri', 'campur'], message: 'Preferensi tipe harus putra, putri, atau campur' },
+        default: '',
+      },
+      harga_maks: { type: Number, default: null, min: [0, 'Anggaran maksimal tidak boleh negatif'] },
+      fasilitas: { type: [String], default: [] },
+    },
   },
   {
     timestamps: true,
