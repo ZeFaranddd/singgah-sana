@@ -1,0 +1,100 @@
+/* ---------- Ringkasan & kartu kos ---------- */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.stats .card { display: flex; flex-direction: column; gap: 16px; height: 100%; }
+.stat-num { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 40px; }
+.action-card { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.action-card .btn { min-width: 220px; }
+.properties { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 24px; }
+.property-card { height: 100%; overflow: hidden; background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--radius-md); display: flex; flex-direction: column; }
+.property-image { position: relative; aspect-ratio: 3 / 2; background: #e2e8f0; }
+.property-image > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.on-image { position: absolute; top: 12px; left: 12px; background: var(--c-surface); }
+.fav-button { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 50%; color: var(--c-brand); background: var(--c-surface); display: grid; place-items: center; }
+.fav-button:hover:not(:disabled) { background: var(--c-brand-soft); }
+.fav-button:disabled { opacity: .5; }
+.property-info { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.property-info h3 { font-size: 16px; line-height: 24px; }
+.property-info h3 a:hover { color: var(--c-brand); text-decoration: underline; }
+.verified { color: var(--color-success-fg); display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.price strong { font-size: 20px; }
+.card-actions { margin-top: auto; padding-top: 8px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.card-actions .btn { width: 100%; min-height: 44px; }
+.inactive-card .property-image > img { filter: grayscale(.6); opacity: .75; }
+.inactive-card .property-info h3, .inactive-card .price { opacity: .8; }
+
+/* ---------- Profil ---------- */
+.profile-card { display: flex; flex-direction: column; gap: 24px; }
+.photo-row { display: flex; gap: 24px; align-items: center; }
+.photo-row > div { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.email-status { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; overflow-wrap: anywhere; }
+
+/* ---------- Filter, notifikasi, preferensi ---------- */
+.filters { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.filters-sort { margin-left: auto; min-width: 200px; }
+.filters-sort .control { min-height: 44px; padding-block: 8px; }
+.filters .btn { min-height: 44px; }
+.notification-list { display: grid; gap: 16px; }
+.notification { width: 100%; display: flex; gap: 16px; text-align: left; color: var(--c-ink); align-items: flex-start; }
+.notification:hover { border-color: var(--color-brand-200); }
+.notification.unread { border-color: var(--color-brand-200); background: #faf8ff; }
+.notif-icon { color: var(--c-brand); flex: none; margin-top: 2px; }
+.notif-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.preferences { display: flex; flex-direction: column; gap: 24px; }
+.preference { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.preference > div { display: grid; gap: 4px; }
+
+/* ---------- Pesan ---------- */
+.messages-layout { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.conversation-list { border: 1px solid var(--c-line); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--c-surface); }
+.conversation-list ul { display: flex; flex-direction: column; gap: 4px; }
+.search { background: var(--c-surface-muted); border-radius: var(--radius-sm); padding: 0 12px; display: flex; align-items: center; gap: 8px; color: var(--c-muted); }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 12px 0; font-size: 14px; color: var(--c-ink); }
+.search input:focus { outline: none; }
+.search:focus-within { box-shadow: 0 0 0 3px var(--c-brand-ring); }
+.conversation { border-radius: var(--radius-md); padding: 14px 16px; background: transparent; display: flex; flex-direction: column; gap: 4px; }
+.conversation:hover { background: var(--c-surface-muted); }
+.conversation.active { background: var(--c-brand-soft); }
+.conversation span, .conversation small { color: var(--c-muted); font-size: 13px; }
+.conversation b { font-size: 12px; font-weight: 600; }
+.conversation span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.unread-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c-brand); margin-left: 8px; }
+.chat { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.chat-placeholder { min-height: 200px; display: grid; place-items: center; }
+.chat-person { display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--c-line); padding-bottom: 16px; }
+.chat-title { font-size: 18px; }
+.back-link { display: none; width: 44px; height: 44px; place-items: center; border-radius: 50%; margin-left: -8px; }
+.back-link:hover { background: var(--c-surface-muted); }
+.related { background: var(--c-surface-muted); border-radius: var(--radius-md); padding: 16px; display: flex; gap: 16px; align-items: center; }
+.related img { width: 96px; height: 72px; object-fit: cover; border-radius: 12px; flex: none; }
+.related > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.thread { display: flex; flex-direction: column; gap: 12px; max-height: 420px; overflow-y: auto; padding: 4px; }
+.bubble { max-width: min(560px, 88%); padding: 12px 16px; border-radius: var(--radius-sm); display: flex; flex-direction: column; gap: 6px; overflow-wrap: anywhere; }
+.bubble.outgoing { align-self: flex-end; background: var(--c-brand-soft); }
+.bubble.incoming { align-self: flex-start; background: var(--c-surface-muted); }
+.bubble small { color: var(--c-muted); font-size: 12px; }
+.bubble small .link { font-size: 12px; display: inline; }
+.composer { display: flex; flex-direction: column; gap: 12px; }
+.send-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.send-row .btn { min-width: 160px; }
+
+@media (max-width: 1000px) {
+  .stats { grid-template-columns: 1fr; gap: 16px; }
+  .messages-layout { grid-template-columns: minmax(0, 1fr); }
+  .messages-layout[data-view="chat"] .conversation-list { display: none; }
+  .messages-layout[data-view="list"] .chat-placeholder { display: none; }
+  .back-link { display: grid; }
+}
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; gap: 16px; }
+  .photo-row { align-items: flex-start; }
+  .card { padding: 20px; border-radius: 18px; }
+  .filters-sort { margin-left: 0; width: 100%; }
+  .action-card .btn { width: 100%; }
+  .related { align-items: flex-start; }
+  .dialog-backdrop { padding: 0; align-items: end; }
+  .dialog { width: 100%; max-height: 100dvh; border-radius: 24px 24px 0 0; padding: 24px 20px; }
+  .dialog-actions { grid-template-columns: 1fr; }
+  .dialog-actions .btn:first-child { order: 2; }
+  .send-row .btn { min-width: 0; }
+}

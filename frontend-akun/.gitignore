@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store
+# Env: hanya contoh dan default pengembangan yang boleh di-commit (tanpa rahasia)
+.env*
+!.env.example
+!.env.development

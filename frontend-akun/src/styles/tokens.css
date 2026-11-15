@@ -1,0 +1,68 @@
+/*
+ * Satu-satunya sumber token desain (Kontrak bagian 6).
+ * Nilai diambil dari Figma page `product`. Tailwind 4 membaca blok @theme,
+ * komponen memakai variabel CSS yang sama, sehingga tidak ada nilai ganda.
+ */
+@theme {
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+
+  --color-ink: #0f172a;
+  --color-muted: #526077; /* kontras 6.3:1 pada putih, 5.8:1 pada slate-50 */
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+
+  --color-success-fg: #166534;
+  --color-success-bg: #f0fdf4;
+  --color-danger-fg: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  --color-danger-line: #ef4444;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --shadow-hover: 0 6px 18px rgb(15 23 42 / 0.08);
+  --shadow-overlay: 0 24px 60px rgb(15 23 42 / 0.22);
+}
+
+:root {
+  /* Font dimuat next/font di app/layout.tsx (self-hosted, tanpa permintaan ke Google saat runtime). */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sora), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Alias semantik untuk CSS komponen. */
+  --c-brand: var(--color-brand-600);
+  --c-brand-soft: var(--color-brand-50);
+  --c-brand-ring: var(--color-brand-100);
+  --c-ink: var(--color-ink);
+  --c-muted: var(--color-muted);
+  --c-line: var(--color-line);
+  --c-surface: var(--color-surface);
+  --c-surface-muted: var(--color-surface-muted);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --page-gutter: 64px;
+  --header-h: 88px;
+}
+
+@media (max-width: 1000px) {
+  :root { --page-gutter: 32px; }
+}
+@media (max-width: 640px) {
+  :root { --page-gutter: 20px; --header-h: 72px; }
+}
