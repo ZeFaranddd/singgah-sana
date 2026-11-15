@@ -63,10 +63,18 @@ function AllKosList({ token, expireSession }) {
   const [exportError, setExportError] = useState('');
   const [exportMessage, setExportMessage] = useState('');
 
-  useEffect(() => {
-    let isCurrent = true;
+  function beginLoading() {
     setIsLoading(true);
     setErrorMessage('');
+  }
+
+  function handleReload() {
+    beginLoading();
+    setReloadKey((key) => key + 1);
+  }
+
+  useEffect(() => {
+    let isCurrent = true;
 
     async function loadKos() {
       const params = new URLSearchParams({
@@ -121,16 +129,24 @@ function AllKosList({ token, expireSession }) {
 
   function handleSearch(event) {
     event.preventDefault();
+    const nextSearchQuery = searchInput.trim();
+    if (nextSearchQuery !== searchQuery || page !== 1) {
+      beginLoading();
+    }
     setPage(1);
-    setSearchQuery(searchInput.trim());
+    setSearchQuery(nextSearchQuery);
   }
 
   function handleStatusChange(event) {
+    if (statusFilter !== event.target.value || page !== 1) {
+      beginLoading();
+    }
     setPage(1);
     setStatusFilter(event.target.value);
   }
 
   function clearSearch() {
+    beginLoading();
     setSearchInput('');
     setSearchQuery('');
     setPage(1);
@@ -279,7 +295,7 @@ function AllKosList({ token, expireSession }) {
           <p>{errorMessage}</p>
           <button
             className="font-semibold underline underline-offset-2"
-            onClick={() => setReloadKey((key) => key + 1)}
+            onClick={handleReload}
             type="button"
           >
             Coba lagi
@@ -407,7 +423,10 @@ function AllKosList({ token, expireSession }) {
             <button
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={page <= 1 || isLoading}
-              onClick={() => setPage((current) => current - 1)}
+              onClick={() => {
+                beginLoading();
+                setPage((current) => current - 1);
+              }}
               type="button"
             >
               Sebelumnya
@@ -418,7 +437,10 @@ function AllKosList({ token, expireSession }) {
             <button
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={page >= pagination.totalPages || isLoading}
-              onClick={() => setPage((current) => current + 1)}
+              onClick={() => {
+                beginLoading();
+                setPage((current) => current + 1);
+              }}
               type="button"
             >
               Berikutnya

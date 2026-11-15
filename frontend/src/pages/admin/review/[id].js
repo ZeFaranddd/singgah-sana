@@ -100,6 +100,12 @@ function KosReviewDetail({ token, expireSession }) {
   const backHref = returnToAllKos ? '/admin/kos' : '/admin/review';
   const backLabel = returnToAllKos ? 'Kembali ke semua kos' : 'Kembali ke antrean';
 
+  function handleReload() {
+    setIsLoading(true);
+    setErrorMessage('');
+    setReloadKey((key) => key + 1);
+  }
+
   async function submitDecision(event) {
     event.preventDefault();
     const reason = decisionNote.trim();
@@ -126,7 +132,7 @@ function KosReviewDetail({ token, expireSession }) {
         setDecisionError(
           'Keputusan mungkin sudah tersimpan, tetapi respons status tidak sesuai. Muat ulang detail untuk memastikan status terbaru.'
         );
-        setReloadKey((key) => key + 1);
+        handleReload();
         return;
       }
 
@@ -167,12 +173,8 @@ function KosReviewDetail({ token, expireSession }) {
     }
 
     let isCurrent = true;
-    setIsLoading(true);
-    setErrorMessage('');
 
     if (!kosId) {
-      setErrorMessage('ID pengajuan tidak tersedia.');
-      setIsLoading(false);
       return () => {
         isCurrent = false;
       };
@@ -217,7 +219,12 @@ function KosReviewDetail({ token, expireSession }) {
     };
   }, [expireSession, kosId, reloadKey, router.isReady, token]);
 
-  if (isLoading) {
+  const missingKosId = router.isReady && !kosId;
+  const visibleErrorMessage = missingKosId
+    ? 'ID pengajuan tidak tersedia.'
+    : errorMessage;
+
+  if (isLoading && !missingKosId) {
     return (
       <p
         aria-live="polite"
@@ -229,11 +236,11 @@ function KosReviewDetail({ token, expireSession }) {
     );
   }
 
-  if (errorMessage) {
+  if (visibleErrorMessage) {
     return (
       <section className="rounded-xl border border-slate-200 bg-white p-8 text-center">
         <p className="text-sm text-red-700" role="alert">
-          {errorMessage}
+          {visibleErrorMessage}
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <Link
@@ -245,7 +252,7 @@ function KosReviewDetail({ token, expireSession }) {
           </Link>
           <button
             className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800"
-            onClick={() => setReloadKey((key) => key + 1)}
+            onClick={handleReload}
             type="button"
           >
             Coba lagi

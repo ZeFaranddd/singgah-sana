@@ -4,24 +4,68 @@ import {
   Building2,
   ClipboardCheck,
   Users,
+  type LucideIcon,
 } from 'lucide-react';
-import AdminPage from '../../components/admin/AdminPage';
 import { getAdminStats } from '../../lib/adminApi';
 import { ApiError } from '../../lib/api';
 
-function isDashboardStats(data) {
+type DashboardStats = {
+  kos: {
+    approved: number;
+    pending: number;
+    totalKamarTersedia: number;
+    totalKamarTotal: number;
+    totalKos: number;
+  };
+  mockRevisionCount?: number | null;
+  users: {
+    totalUsers: number;
+  };
+};
+
+type DashboardContentProps = {
+  expireSession: () => void;
+  token: string;
+};
+
+type StatCardProps = {
+  description: string;
+  icon: LucideIcon;
+  label: string;
+  tone: string;
+  value: number | undefined;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isDashboardStats(data: unknown): data is DashboardStats {
+  if (!isRecord(data) || !isRecord(data.kos) || !isRecord(data.users)) {
+    return false;
+  }
+
+  const { kos, users } = data;
   return (
-    data &&
-    typeof data.kos?.totalKos === 'number' &&
-    typeof data.kos?.pending === 'number' &&
-    typeof data.kos?.approved === 'number' &&
-    typeof data.kos?.totalKamarTersedia === 'number' &&
-    typeof data.kos?.totalKamarTotal === 'number' &&
-    typeof data.users?.totalUsers === 'number'
+    typeof kos.totalKos === 'number' &&
+    typeof kos.pending === 'number' &&
+    typeof kos.approved === 'number' &&
+    typeof kos.totalKamarTersedia === 'number' &&
+    typeof kos.totalKamarTotal === 'number' &&
+    typeof users.totalUsers === 'number' &&
+    (data.mockRevisionCount === undefined ||
+      data.mockRevisionCount === null ||
+      typeof data.mockRevisionCount === 'number')
   );
 }
 
-function StatCard({ icon: Icon, label, value, description, tone }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  description,
+  tone,
+}: StatCardProps) {
   const displayValue =
     typeof value === 'number'
       ? new Intl.NumberFormat('id-ID').format(value)
@@ -47,26 +91,34 @@ function StatCard({ icon: Icon, label, value, description, tone }) {
   );
 }
 
-function DashboardContent({ token, expireSession }) {
-  const [stats, setStats] = useState(null);
+export default function AdminDashboardContent({
+  token,
+  expireSession,
+}: DashboardContentProps) {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [reloadKey, setReloadKey] = useState(0);
 
-  useEffect(() => {
-    let isCurrent = true;
+  function handleReload() {
     setIsLoading(true);
     setErrorMessage('');
+    setReloadKey((key) => key + 1);
+  }
+
+  useEffect(() => {
+    let isCurrent = true;
 
     async function loadStats() {
       try {
         const result = await getAdminStats(token);
-        if (!isDashboardStats(result.data)) {
+        const data: unknown = result.data;
+        if (!isDashboardStats(data)) {
           throw new Error('Format data statistik dari backend tidak sesuai.');
         }
 
         if (isCurrent) {
-          setStats(result.data);
+          setStats(data);
         }
       } catch (error) {
         if (!isCurrent) {
@@ -90,7 +142,7 @@ function DashboardContent({ token, expireSession }) {
       }
     }
 
-    loadStats();
+    void loadStats();
 
     return () => {
       isCurrent = false;
@@ -116,7 +168,7 @@ function DashboardContent({ token, expireSession }) {
           <p>{errorMessage}</p>
           <button
             className="font-semibold underline underline-offset-2"
-            onClick={() => setReloadKey((key) => key + 1)}
+            onClick={handleReload}
             type="button"
           >
             Coba muat ulang
@@ -153,7 +205,7 @@ function DashboardContent({ token, expireSession }) {
         <StatCard
           description={
             stats
-              ? `${new Intl.NumberFormat('id-ID').format(availableRooms)} kamar tersedia`
+              ? `${new Intl.NumberFormat('id-ID').format(stats.kos.totalKamarTersedia)} kamar tersedia`
               : 'Statistik belum tersedia'
           }
           icon={Building2}
@@ -163,15 +215,16 @@ function DashboardContent({ token, expireSession }) {
         />
       </section>
 
-      {stats?.mockRevisionCount > 0 && (
-        <p
-          className="mt-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900"
-          role="status"
-        >
-          Jumlah pending dikurangi {stats.mockRevisionCount} permintaan revisi
-          mock dari sesi browser ini; perubahan belum dikirim ke backend.
-        </p>
-      )}
+      {typeof stats?.mockRevisionCount === 'number' &&
+        stats.mockRevisionCount > 0 && (
+          <p
+            className="mt-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900"
+            role="status"
+          >
+            Jumlah pending dikurangi {stats.mockRevisionCount} permintaan revisi
+            mock dari sesi browser ini; perubahan belum dikirim ke backend.
+          </p>
+        )}
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -188,10 +241,16 @@ function DashboardContent({ token, expireSession }) {
             {stats ? (
               <>
                 <span className="text-3xl font-bold">
-                  {new Intl.NumberFormat('id-ID').format(availableRooms)}
+                  {new Intl.NumberFormat('id-ID').format(
+                    stats.kos.totalKamarTersedia
+                  )}
                 </span>
                 <span className="text-sm text-slate-500">
-                  dari {new Intl.NumberFormat('id-ID').format(totalRooms)} kamar
+                  dari{' '}
+                  {new Intl.NumberFormat('id-ID').format(
+                    stats.kos.totalKamarTotal
+                  )}{' '}
+                  kamar
                 </span>
               </>
             ) : (
@@ -245,18 +304,5 @@ function DashboardContent({ token, expireSession }) {
         pengelolaan laporan.
       </p>
     </>
-  );
-}
-
-export default function AdminDashboardPage() {
-  return (
-    <AdminPage
-      pageDescription="Pantau antrean peninjauan dan hal yang membutuhkan perhatian."
-      pageTitle="Ringkasan admin"
-    >
-      {({ token, expireSession }) => (
-        <DashboardContent expireSession={expireSession} token={token} />
-      )}
-    </AdminPage>
   );
 }

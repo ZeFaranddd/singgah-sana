@@ -1,19 +1,24 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+'use client';
+
+import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, KeyRound, Mail, ShieldCheck } from 'lucide-react';
 import { ADMIN_TOKEN_KEY } from '../../lib/auth';
 import { loginAdmin } from '../../lib/adminApi';
 
-export default function AdminLoginPage() {
+type AdminLoginFormProps = {
+  expired: boolean;
+};
+
+export default function AdminLoginForm({ expired }: AdminLoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const expired = router.query.expired === '1';
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage('');
     setIsSubmitting(true);
@@ -31,7 +36,7 @@ export default function AdminLoginPage() {
       }
 
       window.sessionStorage.setItem(ADMIN_TOKEN_KEY, result.data.token);
-      await router.replace('/admin');
+      router.replace('/admin');
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -131,7 +136,9 @@ export default function AdminLoginPage() {
                 value={password}
               />
               <button
-                aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                aria-label={
+                  showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'
+                }
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 onClick={() => setShowPassword((visible) => !visible)}
                 type="button"

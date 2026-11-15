@@ -54,10 +54,18 @@ function UserList({ token, expireSession }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [reloadKey, setReloadKey] = useState(0);
 
-  useEffect(() => {
-    let isCurrent = true;
+  function beginLoading() {
     setIsLoading(true);
     setErrorMessage('');
+  }
+
+  function handleReload() {
+    beginLoading();
+    setReloadKey((key) => key + 1);
+  }
+
+  useEffect(() => {
+    let isCurrent = true;
 
     async function loadUsers() {
       const params = new URLSearchParams();
@@ -110,10 +118,22 @@ function UserList({ token, expireSession }) {
 
   function handleSearch(event) {
     event.preventDefault();
-    setSearchQuery(searchInput.trim());
+    const nextSearchQuery = searchInput.trim();
+    if (nextSearchQuery !== searchQuery) {
+      beginLoading();
+    }
+    setSearchQuery(nextSearchQuery);
+  }
+
+  function handleRoleChange(event) {
+    if (roleFilter !== event.target.value) {
+      beginLoading();
+    }
+    setRoleFilter(event.target.value);
   }
 
   function clearSearch() {
+    beginLoading();
     setSearchInput('');
     setSearchQuery('');
   }
@@ -163,7 +183,7 @@ function UserList({ token, expireSession }) {
             <span className="sr-only">Filter peran pengguna</span>
             <select
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100"
-              onChange={(event) => setRoleFilter(event.target.value)}
+              onChange={handleRoleChange}
               value={roleFilter}
             >
               {roles.map((role) => (
@@ -205,7 +225,7 @@ function UserList({ token, expireSession }) {
             <p>{errorMessage}</p>
             <button
               className="font-semibold underline underline-offset-2"
-              onClick={() => setReloadKey((key) => key + 1)}
+              onClick={handleReload}
               type="button"
             >
               Coba lagi

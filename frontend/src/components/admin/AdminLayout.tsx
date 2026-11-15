@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import {
   Activity,
   ChevronRight,
@@ -13,8 +12,31 @@ import {
   ShieldCheck,
   Users,
   X,
+  type LucideIcon,
 } from 'lucide-react';
 import { cn } from '../../lib/cn';
+
+import type { AdminUser } from '../../hooks/useAdminSession';
+
+type NavigationItem = {
+  href?: string;
+  icon: LucideIcon;
+  label: string;
+};
+
+type NavigationItemsProps = {
+  onNavigate: () => void;
+  pathname: string;
+};
+
+type AdminLayoutProps = {
+  admin: AdminUser;
+  children: ReactNode;
+  onLogout: () => void;
+  pageDescription: string;
+  pageTitle: string;
+  pathname: string;
+};
 
 const navigation = [
   { label: 'Ringkasan', href: '/admin', icon: LayoutDashboard },
@@ -23,9 +45,9 @@ const navigation = [
   { label: 'Pengguna', href: '/admin/users', icon: Users },
   { label: 'Laporan', icon: Flag },
   { label: 'Aktivitas', icon: Activity },
-];
+] satisfies NavigationItem[];
 
-function NavigationItems({ onNavigate, pathname }) {
+function NavigationItems({ onNavigate, pathname }: NavigationItemsProps) {
   return navigation.map((item) => {
     const Icon = item.icon;
     const isActive =
@@ -72,11 +94,11 @@ export default function AdminLayout({
   onLogout,
   pageTitle,
   pageDescription,
-}) {
+  pathname,
+}: AdminLayoutProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const router = useRouter();
-  const menuButtonRef = useRef(null);
-  const closeButtonRef = useRef(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!isMobileNavOpen) {
@@ -84,7 +106,7 @@ export default function AdminLayout({
     }
 
     closeButtonRef.current?.focus();
-    function handleEscape(event) {
+    function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setIsMobileNavOpen(false);
         menuButtonRef.current?.focus();
@@ -143,7 +165,7 @@ export default function AdminLayout({
           </p>
           <NavigationItems
             onNavigate={closeMobileNav}
-            pathname={router.pathname}
+            pathname={pathname}
           />
         </nav>
 
