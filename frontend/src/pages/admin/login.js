@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Eye, EyeOff, KeyRound, Mail, ShieldCheck } from 'lucide-react';
 import { ADMIN_TOKEN_KEY } from '../../lib/auth';
-import { apiRequest } from '../../lib/api';
+import { loginAdmin } from '../../lib/adminApi';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -19,10 +19,7 @@ export default function AdminLoginPage() {
     setIsSubmitting(true);
 
     try {
-      const result = await apiRequest('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
+      const result = await loginAdmin({ email: email.trim(), password });
 
       if (result.data?.role !== 'admin') {
         setErrorMessage('Akun ini tidak memiliki akses admin.');

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Search, UserRound } from 'lucide-react';
 import AdminPage from '../../../components/admin/AdminPage';
-import { ApiError, apiRequest } from '../../../lib/api';
+import { getAdminUsers } from '../../../lib/adminApi';
+import { ApiError } from '../../../lib/api';
 import { formatAdminDate } from '../../../lib/formatters';
 
 const roles = [
@@ -69,10 +70,7 @@ function UserList({ token, expireSession }) {
       const queryString = params.toString();
 
       try {
-        const result = await apiRequest(
-          `/admin/users${queryString ? `?${queryString}` : ''}`,
-          { token }
-        );
+        const result = await getAdminUsers(queryString, token);
         if (!isUserListResponse(result)) {
           throw new Error('Format data pengguna dari backend tidak sesuai.');
         }
@@ -122,7 +120,10 @@ function UserList({ token, expireSession }) {
 
   return (
     <>
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <section
+        aria-busy={isLoading}
+        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+      >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">Daftar pengguna</h2>
@@ -212,14 +213,28 @@ function UserList({ token, expireSession }) {
           </div>
         )}
 
-        <div className="mt-5 overflow-x-auto">
+        <div
+          aria-label="Daftar pengguna; gunakan tombol panah untuk menggulir tabel"
+          className="mt-5 overflow-x-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+          role="region"
+          tabIndex={0}
+        >
           <table className="w-full min-w-[700px] border-collapse text-left text-sm">
+            <caption className="sr-only">Daftar akun pengguna</caption>
             <thead>
               <tr className="border-y border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                <th className="px-4 py-3 font-semibold">Nama / email</th>
-                <th className="px-4 py-3 font-semibold">Peran</th>
-                <th className="px-4 py-3 font-semibold">Nomor telepon</th>
-                <th className="px-4 py-3 font-semibold">Bergabung</th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Nama / email
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Peran
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Nomor telepon
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Bergabung
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -238,7 +253,9 @@ function UserList({ token, expireSession }) {
                 <tr>
                   <td className="px-4 py-12 text-center" colSpan={4}>
                     <p className="font-medium text-slate-800">
-                      Tidak ada pengguna dengan filter ini.
+                      {searchQuery
+                        ? `Tidak ada hasil pengguna untuk "${searchQuery}".`
+                        : 'Tidak ada pengguna dengan filter ini.'}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
                       Coba ubah peran atau kata pencarian.

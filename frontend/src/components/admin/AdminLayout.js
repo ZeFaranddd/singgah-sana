@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -75,6 +75,30 @@ export default function AdminLayout({
 }) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const router = useRouter();
+  const menuButtonRef = useRef(null);
+  const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!isMobileNavOpen) {
+      return undefined;
+    }
+
+    closeButtonRef.current?.focus();
+    function handleEscape(event) {
+      if (event.key === 'Escape') {
+        setIsMobileNavOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMobileNavOpen]);
+
+  function closeMobileNav() {
+    setIsMobileNavOpen(false);
+    menuButtonRef.current?.focus();
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -82,15 +106,16 @@ export default function AdminLayout({
         <button
           aria-label="Tutup menu navigasi"
           className="fixed inset-0 z-20 bg-slate-950/30 lg:hidden"
-          onClick={() => setIsMobileNavOpen(false)}
+          onClick={closeMobileNav}
           type="button"
         />
       )}
 
       <aside
+        id="admin-navigation-sidebar"
         className={cn(
-          'fixed inset-y-0 left-0 z-30 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0',
-          isMobileNavOpen && 'translate-x-0'
+          'invisible fixed inset-y-0 left-0 z-30 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 motion-reduce:transition-none lg:visible lg:translate-x-0',
+          isMobileNavOpen && 'visible translate-x-0'
         )}
       >
         <div className="flex h-20 items-center gap-3 border-b border-slate-100 px-6">
@@ -104,7 +129,8 @@ export default function AdminLayout({
           <button
             aria-label="Tutup menu navigasi"
             className="ml-auto rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
-            onClick={() => setIsMobileNavOpen(false)}
+            onClick={closeMobileNav}
+            ref={closeButtonRef}
             type="button"
           >
             <X aria-hidden="true" size={18} />
@@ -116,7 +142,7 @@ export default function AdminLayout({
             Administrasi
           </p>
           <NavigationItems
-            onNavigate={() => setIsMobileNavOpen(false)}
+            onNavigate={closeMobileNav}
             pathname={router.pathname}
           />
         </nav>
@@ -131,8 +157,11 @@ export default function AdminLayout({
           <div className="flex min-w-0 items-center gap-3">
             <button
               aria-label="Buka menu navigasi"
+              aria-controls="admin-navigation-sidebar"
+              aria-expanded={isMobileNavOpen}
               className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 lg:hidden"
               onClick={() => setIsMobileNavOpen(true)}
+              ref={menuButtonRef}
               type="button"
             >
               <Menu aria-hidden="true" size={20} />
@@ -168,7 +197,17 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-8">
+        <a
+          className="sr-only rounded bg-white px-4 py-2 text-indigo-800 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:ring-2 focus:ring-indigo-600"
+          href="#admin-main"
+        >
+          Lewati navigasi
+        </a>
+        <main
+          className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-8"
+          id="admin-main"
+          tabIndex={-1}
+        >
           <div className="mb-7 flex items-center gap-2 text-xs text-slate-500">
             <span>Administrasi</span>
             <ChevronRight aria-hidden="true" size={14} />

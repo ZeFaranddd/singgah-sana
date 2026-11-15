@@ -6,24 +6,31 @@ import {
   ADMIN_KOS_PAGE_SIZE,
   isAdminKosListResponse,
 } from '../../../lib/adminKos';
-import { ApiError, apiDownload, apiRequest } from '../../../lib/api';
+import {
+  downloadAdminKosCsv,
+  getAdminKos,
+} from '../../../lib/adminApi';
+import { ApiError } from '../../../lib/api';
 import { formatAdminDate } from '../../../lib/formatters';
 
 const verificationStatuses = [
   { label: 'Semua status', value: '' },
   { label: 'Menunggu', value: 'pending' },
+  { label: 'Perlu revisi', value: 'revision' },
   { label: 'Terbit', value: 'approved' },
   { label: 'Ditolak', value: 'rejected' },
 ];
 
 const statusStyles = {
   pending: 'bg-amber-50 text-amber-800',
+  revision: 'bg-orange-50 text-orange-800',
   approved: 'bg-emerald-50 text-emerald-800',
   rejected: 'bg-rose-50 text-rose-800',
 };
 
 const statusLabels = {
   pending: 'Menunggu',
+  revision: 'Perlu revisi',
   approved: 'Terbit',
   rejected: 'Ditolak',
 };
@@ -74,9 +81,7 @@ function AllKosList({ token, expireSession }) {
       }
 
       try {
-        const result = await apiRequest(`/admin/kos?${params.toString()}`, {
-          token,
-        });
+        const result = await getAdminKos(params.toString(), token);
         if (!isAdminKosListResponse(result)) {
           throw new Error('Format data daftar kos dari backend tidak sesuai.');
         }
@@ -137,9 +142,7 @@ function AllKosList({ token, expireSession }) {
     setExportMessage('');
 
     try {
-      const { blob, filename } = await apiDownload('/admin/export/kos', {
-        token,
-      });
+      const { blob, filename } = await downloadAdminKosCsv(token);
       const objectUrl = URL.createObjectURL(blob);
       const downloadLink = document.createElement('a');
       downloadLink.href = objectUrl;
@@ -166,7 +169,10 @@ function AllKosList({ token, expireSession }) {
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section
+      aria-busy={isLoading}
+      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+    >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">Semua kos</h2>
@@ -281,15 +287,31 @@ function AllKosList({ token, expireSession }) {
         </div>
       )}
 
-      <div className="mt-5 overflow-x-auto">
+      <div
+        aria-label="Daftar semua kos; gunakan tombol panah untuk menggulir tabel"
+        className="mt-5 overflow-x-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+        role="region"
+        tabIndex={0}
+      >
         <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+          <caption className="sr-only">Daftar semua kos</caption>
           <thead>
             <tr className="border-y border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-              <th className="px-4 py-3 font-semibold">Kos</th>
-              <th className="px-4 py-3 font-semibold">Pemilik</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Diperbarui</th>
-              <th className="px-4 py-3 text-right font-semibold">Detail</th>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Kos
+              </th>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Pemilik
+              </th>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Status
+              </th>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Diperbarui
+              </th>
+              <th className="px-4 py-3 text-right font-semibold" scope="col">
+                Detail
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -308,7 +330,9 @@ function AllKosList({ token, expireSession }) {
               <tr>
                 <td className="px-4 py-12 text-center" colSpan={5}>
                   <p className="font-medium text-slate-800">
-                    Tidak ada kos dengan filter ini.
+                    {searchQuery
+                      ? `Tidak ada hasil kos untuk "${searchQuery}".`
+                      : 'Tidak ada kos dengan filter ini.'}
                   </p>
                   <p className="mt-1 text-sm text-slate-500">
                     Coba ubah status atau kata pencarian.
@@ -344,7 +368,14 @@ function AllKosList({ token, expireSession }) {
                     )}
                   </td>
                   <td className="px-4 py-4">
-                    <KosStatus status={kos.status_verifikasi} />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <KosStatus status={kos.status_verifikasi} />
+                      {kos.isMockDecision && (
+                        <span className="rounded-full bg-orange-100 px-2 py-1 text-[11px] font-semibold text-orange-800">
+                          Mock lokal
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-4 text-slate-600">
                     {formatAdminDate(kos.updatedAt)}

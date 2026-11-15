@@ -23,6 +23,12 @@
     "postcss": "8.5.33",
     "tailwindcss": "3.4.19"
   },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Edge versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions"
+  ],
   "overrides": {
     "postcss": "8.5.33"
   }

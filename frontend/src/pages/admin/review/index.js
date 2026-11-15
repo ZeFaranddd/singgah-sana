@@ -2,18 +2,27 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import AdminPage from '../../../components/admin/AdminPage';
+import { ADMIN_KOS_PAGE_SIZE } from '../../../lib/adminKos';
 import {
-  ADMIN_KOS_PAGE_SIZE,
-  isAdminKosListResponse,
-} from '../../../lib/adminKos';
-import { ApiError, apiRequest } from '../../../lib/api';
+  getAdminModerationQueue,
+  isAdminModerationQueueResponse,
+} from '../../../lib/adminApi';
+import { isMockAdminChangeKos } from '../../../lib/adminMockData';
+import { ApiError } from '../../../lib/api';
 import { formatAdminDate } from '../../../lib/formatters';
 
+const queueTypes = [
+  { label: 'Semua antrean', value: 'semua' },
+  { label: 'Listing baru', value: 'listing_baru' },
+  { label: 'Perubahan listing', value: 'perubahan' },
+];
+
 function ReviewQueue({ token, expireSession }) {
-  const [kosList, setKosList] = useState([]);
+  const [queueItems, setQueueItems] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [queueType, setQueueType] = useState('semua');
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -26,7 +35,7 @@ function ReviewQueue({ token, expireSession }) {
 
     async function loadQueue() {
       const params = new URLSearchParams({
-        status: 'pending',
+        jenis: queueType,
         page: String(page),
         limit: String(ADMIN_KOS_PAGE_SIZE),
       });
@@ -35,15 +44,16 @@ function ReviewQueue({ token, expireSession }) {
       }
 
       try {
-        const result = await apiRequest(`/admin/kos?${params.toString()}`, {
-          token,
-        });
-        if (!isAdminKosListResponse(result)) {
+        const result = await getAdminModerationQueue(
+          params.toString(),
+          token
+        );
+        if (!isAdminModerationQueueResponse(result)) {
           throw new Error('Format data antrean dari backend tidak sesuai.');
         }
 
         if (isCurrent) {
-          setKosList(result.data);
+          setQueueItems(result.data);
           setPagination(result.pagination);
         }
       } catch (error) {
@@ -73,7 +83,7 @@ function ReviewQueue({ token, expireSession }) {
     return () => {
       isCurrent = false;
     };
-  }, [expireSession, page, reloadKey, searchQuery, token]);
+  }, [expireSession, page, queueType, reloadKey, searchQuery, token]);
 
   function handleSearch(event) {
     event.preventDefault();
@@ -87,31 +97,42 @@ function ReviewQueue({ token, expireSession }) {
     setPage(1);
   }
 
+  function handleQueueTypeChange(event) {
+    setPage(1);
+    setQueueType(event.target.value);
+  }
+
   return (
     <>
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <section
+        aria-busy={isLoading}
+        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+      >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">Antrean peninjauan</h2>
+              <h2 className="text-lg font-semibold">Antrean moderasi</h2>
               {pagination && (
                 <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                  Menunggu ({pagination.totalData})
+                  Antrean ({pagination.totalData})
                 </span>
               )}
             </div>
             <p className="mt-1 text-sm text-slate-500">
-              Pengajuan kos berstatus pending. Dahulukan pengajuan paling lama.
+              Tinjau pengajuan listing baru dan perubahan listing, dimulai dari
+              yang paling lama.
             </p>
           </div>
         </div>
 
         <form
-          className="mt-6 flex flex-col gap-3 sm:flex-row"
+          className="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_auto]"
           onSubmit={handleSearch}
         >
           <label className="relative min-w-0 flex-1">
-            <span className="sr-only">Cari nama kos, alamat, atau area kampus</span>
+            <span className="sr-only">
+              Cari nama atau kode kos/pemilik
+            </span>
             <Search
               aria-hidden="true"
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -120,10 +141,24 @@ function ReviewQueue({ token, expireSession }) {
             <input
               className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100"
               onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Cari nama kos, alamat, atau area kampus"
+              placeholder="Cari nama atau kode kos/pemilik"
               type="search"
               value={searchInput}
             />
+          </label>
+          <label>
+            <span className="sr-only">Filter jenis antrean</span>
+            <select
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100"
+              onChange={handleQueueTypeChange}
+              value={queueType}
+            >
+              {queueTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
           </label>
           <div className="flex gap-2">
             <button
@@ -161,19 +196,35 @@ function ReviewQueue({ token, expireSession }) {
           </div>
         )}
 
-        <div className="mt-5 overflow-x-auto">
+        <div
+          aria-label="Daftar antrean moderasi; gunakan tombol panah untuk menggulir tabel"
+          className="mt-5 overflow-x-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+          role="region"
+          tabIndex={0}
+        >
           <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+            <caption className="sr-only">Daftar antrean moderasi kos</caption>
             <thead>
               <tr className="border-y border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                <th className="px-4 py-3 font-semibold">Kos / pengajuan</th>
-                <th className="px-4 py-3 font-semibold">Pemilik</th>
-                <th className="px-4 py-3 font-semibold">Tipe</th>
-                <th className="px-4 py-3 font-semibold">Dikirim</th>
-                <th className="px-4 py-3 text-right font-semibold">Aksi</th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Kos / pengajuan
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Pemilik
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Jenis antrean
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Dikirim
+                </th>
+                <th className="px-4 py-3 text-right font-semibold" scope="col">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {isLoading && kosList.length === 0 && (
+              {isLoading && queueItems.length === 0 && (
                 <tr>
                   <td
                     className="px-4 py-10 text-center text-slate-500"
@@ -188,48 +239,59 @@ function ReviewQueue({ token, expireSession }) {
                 <tr>
                   <td className="px-4 py-12 text-center" colSpan={5}>
                     <p className="font-medium text-slate-800">
-                      Tidak ada pengajuan yang menunggu.
+                      {searchQuery
+                        ? `Tidak ada hasil antrean untuk "${searchQuery}".`
+                        : 'Tidak ada item pada antrean ini.'}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
-                      Pengajuan baru akan muncul di antrean ini.
+                      {searchQuery
+                        ? 'Coba kata pencarian lain atau hapus pencarian.'
+                        : 'Pengajuan baru atau perubahan listing akan muncul di sini.'}
                     </p>
                   </td>
                 </tr>
               )}
-              {kosList.map((kos) => {
-                const owner =
-                  kos.pemilik_id && typeof kos.pemilik_id === 'object'
-                    ? kos.pemilik_id
-                    : null;
-
+              {queueItems.map((item) => {
+                const isMockChange = isMockAdminChangeKos(item.kos._id);
                 return (
-                  <tr className="hover:bg-slate-50/70" key={kos._id}>
+                  <tr className="hover:bg-slate-50/70" key={item.kos._id}>
                     <td className="px-4 py-4">
-                      <p className="font-semibold text-slate-900">{kos.nama}</p>
+                      <p className="font-semibold text-slate-900">
+                        {item.kos.nama}
+                      </p>
                       <p className="mt-1 font-mono text-xs text-slate-500">
-                        ID {kos._id}
+                        {item.kos.kode || `ID ${item.kos._id}`}
                       </p>
                     </td>
                     <td className="px-4 py-4">
                       <p className="font-medium text-slate-800">
-                        {owner?.nama || 'Pemilik tidak tersedia'}
+                        {item.pemilik.nama || 'Pemilik tidak tersedia'}
                       </p>
-                      {owner?.email && (
+                      {item.pemilik.kode && (
                         <p className="mt-1 text-xs text-slate-500">
-                          {owner.email}
+                          {item.pemilik.kode}
                         </p>
                       )}
                     </td>
-                    <td className="px-4 py-4 capitalize text-slate-700">
-                      {kos.tipe}
+                    <td className="px-4 py-4">
+                      <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-800">
+                        {item.jenis === 'perubahan'
+                          ? 'Perubahan listing'
+                          : 'Listing baru'}
+                      </span>
+                      {isMockChange && (
+                        <span className="ml-2 rounded-full bg-orange-100 px-2 py-1 text-[11px] font-semibold text-orange-800">
+                          Mock
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-4 text-slate-600">
-                      {formatAdminDate(kos.createdAt)}
+                      {formatAdminDate(item.dikirim_pada)}
                     </td>
                     <td className="px-4 py-4 text-right">
                       <Link
                         className="inline-flex rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-800"
-                        href={`/admin/review/${encodeURIComponent(kos._id)}`}
+                        href={`/admin/review/${encodeURIComponent(item.kos._id)}`}
                       >
                         Tinjau
                       </Link>
@@ -244,7 +306,7 @@ function ReviewQueue({ token, expireSession }) {
         {pagination && pagination.totalData > 0 && (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
             <p className="text-sm text-slate-500">
-              Menampilkan {kosList.length} dari {pagination.totalData} pengajuan
+              Menampilkan {queueItems.length} dari {pagination.totalData} item
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -271,10 +333,13 @@ function ReviewQueue({ token, expireSession }) {
         )}
       </section>
 
-      <p className="mt-4 text-xs leading-5 text-slate-500">
-        Backend saat ini belum membedakan pengajuan listing baru dan perubahan
-        listing.
-      </p>
+      {queueType !== 'listing_baru' && (
+        <p className="mt-4 text-xs leading-5 text-slate-500">
+          Antrean perubahan saat ini menggunakan contoh mock lokal sampai
+          endpoint baru tersedia. Keputusan atas perubahan belum dikirim ke
+          backend.
+        </p>
+      )}
     </>
   );
 }

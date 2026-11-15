@@ -6,7 +6,8 @@ import {
   Users,
 } from 'lucide-react';
 import AdminPage from '../../components/admin/AdminPage';
-import { ApiError, apiRequest } from '../../lib/api';
+import { getAdminStats } from '../../lib/adminApi';
+import { ApiError } from '../../lib/api';
 
 function isDashboardStats(data) {
   return (
@@ -59,7 +60,7 @@ function DashboardContent({ token, expireSession }) {
 
     async function loadStats() {
       try {
-        const result = await apiRequest('/admin/stats', { token });
+        const result = await getAdminStats(token);
         if (!isDashboardStats(result.data)) {
           throw new Error('Format data statistik dari backend tidak sesuai.');
         }
@@ -125,6 +126,7 @@ function DashboardContent({ token, expireSession }) {
 
       <section
         aria-label="Statistik portal"
+        aria-busy={isLoading}
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         <StatCard
@@ -160,6 +162,16 @@ function DashboardContent({ token, expireSession }) {
           value={stats?.kos.totalKos}
         />
       </section>
+
+      {stats?.mockRevisionCount > 0 && (
+        <p
+          className="mt-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900"
+          role="status"
+        >
+          Jumlah pending dikurangi {stats.mockRevisionCount} permintaan revisi
+          mock dari sesi browser ini; perubahan belum dikirim ke backend.
+        </p>
+      )}
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

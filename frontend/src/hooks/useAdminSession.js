@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ApiError, apiRequest } from '../lib/api';
+import { getAdminSession } from '../lib/adminApi';
+import { ApiError } from '../lib/api';
 import { ADMIN_TOKEN_KEY } from '../lib/auth';
 
 export default function useAdminSession() {
@@ -52,13 +53,15 @@ export default function useAdminSession() {
 
     async function checkSession() {
       try {
-        const result = await apiRequest('/auth/me', { token: storedToken });
+        const result = await getAdminSession(storedToken);
         if (!isCurrent) {
           return;
         }
 
         if (result.data?.role !== 'admin') {
           window.sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+          setAdmin(null);
+          setToken(null);
           setStatus('forbidden');
           return;
         }
@@ -68,6 +71,14 @@ export default function useAdminSession() {
         setStatus('authenticated');
       } catch (error) {
         if (!isCurrent) {
+          return;
+        }
+
+        if (error instanceof ApiError && error.status === 403) {
+          window.sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+          setAdmin(null);
+          setToken(null);
+          setStatus('forbidden');
           return;
         }
 

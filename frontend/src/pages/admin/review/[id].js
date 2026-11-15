@@ -11,7 +11,12 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import AdminPage from '../../../components/admin/AdminPage';
-import { ApiError, apiRequest } from '../../../lib/api';
+import {
+  decideAdminKos,
+  getAdminKosDetail,
+} from '../../../lib/adminApi';
+import { isMockAdminChangeKos } from '../../../lib/adminMockData';
+import { ApiError } from '../../../lib/api';
 
 function formatCurrency(value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -37,16 +42,44 @@ function formatDate(value) {
   }).format(date);
 }
 
+function formatChangeValue(value) {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? value.join(', ') : 'Tidak ada';
+  }
+  if (value === null || value === undefined || value === '') {
+    return 'Tidak tersedia';
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+}
+
 const verificationStatusLabels = {
   pending: 'Menunggu peninjauan',
+  revision: 'Perlu revisi',
   approved: 'Disetujui',
   rejected: 'Ditolak',
 };
 
 const verificationStatusStyles = {
   pending: 'bg-amber-50 text-amber-800',
+  revision: 'bg-orange-50 text-orange-800',
   approved: 'bg-emerald-50 text-emerald-800',
   rejected: 'bg-red-50 text-red-800',
+};
+
+const decisionActionLabels = {
+  approved: 'menyetujui',
+  revision: 'meminta revisi',
+  rejected: 'menolak',
+};
+
+const decisionButtonLabels = {
+  approved: 'Konfirmasi persetujuan',
+  revision: 'Konfirmasi permintaan revisi',
+  rejected: 'Konfirmasi penolakan',
 };
 
 function KosReviewDetail({ token, expireSession }) {
@@ -79,16 +112,14 @@ function KosReviewDetail({ token, expireSession }) {
     setDecisionSuccess('');
 
     try {
-      const result = await apiRequest(
-        `/admin/kos/${encodeURIComponent(kosId)}/verifikasi`,
+      const result = await decideAdminKos(
+        kosId,
         {
-          token,
-          method: 'PATCH',
-          body: JSON.stringify({
-            status_verifikasi: decisionIntent,
-            catatan_verifikasi: reason,
-          }),
-        }
+          status_verifikasi: decisionIntent,
+          catatan_verifikasi: reason,
+        },
+        token,
+        kos
       );
 
       if (result.data?.status_verifikasi !== decisionIntent) {
@@ -107,6 +138,7 @@ function KosReviewDetail({ token, expireSession }) {
               catatan_verifikasi: result.data.catatan_verifikasi,
               diverifikasi_oleh: result.data.diverifikasi_oleh,
               diverifikasi_pada: result.data.diverifikasi_pada,
+              isMockDecision: Boolean(result.data.isMockDecision),
             }
           : currentKos
       );
@@ -148,10 +180,7 @@ function KosReviewDetail({ token, expireSession }) {
 
     async function loadKos() {
       try {
-        const result = await apiRequest(
-          `/kos/${encodeURIComponent(kosId)}`,
-          { token }
-        );
+        const result = await getAdminKosDetail(kosId, token);
         if (!result.data || typeof result.data !== 'object') {
           throw new Error('Detail pengajuan dari backend tidak valid.');
         }
@@ -190,7 +219,11 @@ function KosReviewDetail({ token, expireSession }) {
 
   if (isLoading) {
     return (
-      <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600">
+      <p
+        aria-live="polite"
+        className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600"
+        role="status"
+      >
         Memuat detail pengajuan...
       </p>
     );
@@ -227,12 +260,18 @@ function KosReviewDetail({ token, expireSession }) {
   }
 
   const owner =
-    kos.pemilik_id && typeof kos.pemilik_id === 'object'
+    kos.pemilik ||
+    (kos.pemilik_id && typeof kos.pemilik_id === 'object'
       ? kos.pemilik_id
-      : null;
+      : null);
   const photos = Array.isArray(kos.foto) ? kos.foto : [];
   const amenities = Array.isArray(kos.fasilitas) ? kos.fasilitas : [];
   const rules = Array.isArray(kos.peraturan) ? kos.peraturan : [];
+  const roomTypes = Array.isArray(kos.tipe_kamar) ? kos.tipe_kamar : [];
+  const changes = Array.isArray(kos.perubahan_tertunda?.daftar_perubahan)
+    ? kos.perubahan_tertunda.daftar_perubahan
+    : [];
+  const isMockChange = isMockAdminChangeKos(kos._id);
   const coordinates = kos.koordinat;
 
   return (
@@ -246,10 +285,30 @@ function KosReviewDetail({ token, expireSession }) {
       </Link>
 
       <div className="space-y-6">
+        {isMockChange && (
+          <p
+            className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900"
+            role="status"
+          >
+            Detail perubahan ini adalah contoh mock lokal. Data dan keputusan
+            perubahan belum terhubung ke backend.
+          </p>
+        )}
+        {kos.isMockDecision && (
+          <p
+            className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900"
+            role="status"
+          >
+            Status revisi ini hanya tersimpan di sesi browser dan belum dikirim
+            ke backend.
+          </p>
+        )}
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="font-mono text-xs text-slate-500">ID {kos._id}</p>
+              <p className="font-mono text-xs text-slate-500">
+                {kos.kode ? `Kode ${kos.kode}` : `ID ${kos._id}`}
+              </p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight">
                 {kos.nama}
               </h2>
@@ -284,10 +343,96 @@ function KosReviewDetail({ token, expireSession }) {
             </div>
           )}
           <p className="mt-5 rounded-lg border border-sky-100 bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-900">
-            Detail ini menampilkan data kos yang tersimpan saat ini. Backend
-            belum menyediakan versi pembanding atau riwayat perubahan per field.
+            {changes.length > 0
+              ? 'Versi terbit tetap tampil di publik sampai admin menyetujui perubahan ini.'
+              : 'Detail ini menampilkan data kos yang tersimpan saat ini. Backend belum menyediakan versi pembanding atau riwayat perubahan per field.'}
           </p>
         </section>
+
+        {kos.perubahan_tertunda && (
+          <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="font-semibold">Perubahan listing tertunda</h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  Diajukan pada{' '}
+                  {formatDate(kos.perubahan_tertunda.diajukan_pada)}
+                </p>
+              </div>
+              <span className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-800">
+                {kos.perubahan_tertunda.status === 'revision'
+                  ? 'Perlu revisi'
+                  : kos.perubahan_tertunda.status === 'rejected'
+                    ? 'Ditolak'
+                    : 'Menunggu'}
+              </span>
+            </div>
+
+            {kos.perubahan_tertunda.catatan_pemilik && (
+              <p className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+                <span className="font-semibold">Catatan pemilik: </span>
+                {kos.perubahan_tertunda.catatan_pemilik}
+              </p>
+            )}
+
+            {changes.length > 0 ? (
+              <div
+                aria-label="Perbandingan perubahan listing; gunakan tombol panah untuk menggulir tabel"
+                className="mt-5 overflow-x-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+                role="region"
+                tabIndex={0}
+              >
+                <table className="w-full min-w-[700px] border-collapse text-left text-sm">
+                  <caption className="sr-only">
+                    Perbandingan data listing terbit dan perubahan yang diajukan
+                  </caption>
+                  <thead>
+                    <tr className="border-y border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                      <th className="px-4 py-3 font-semibold" scope="col">
+                        Bagian
+                      </th>
+                      <th className="px-4 py-3 font-semibold" scope="col">
+                        Data terbit
+                      </th>
+                      <th className="px-4 py-3 font-semibold" scope="col">
+                        Perubahan diajukan
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {changes.map((change) => (
+                      <tr key={change.field}>
+                        <th
+                          className="px-4 py-4 align-top font-semibold text-slate-800"
+                          scope="row"
+                        >
+                          {change.label || change.field}
+                        </th>
+                        <td className="whitespace-pre-line px-4 py-4 align-top text-slate-600">
+                          {formatChangeValue(change.lama)}
+                        </td>
+                        <td className="whitespace-pre-line px-4 py-4 align-top font-medium text-slate-800">
+                          {formatChangeValue(change.baru)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mt-4 text-sm text-slate-500">
+                Detail perbandingan perubahan belum tersedia.
+              </p>
+            )}
+
+            {kos.perubahan_tertunda.catatan_admin && (
+              <p className="mt-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm leading-6 text-orange-900">
+                <span className="font-semibold">Catatan admin: </span>
+                {kos.perubahan_tertunda.catatan_admin}
+              </p>
+            )}
+          </section>
+        )}
 
         {decisionSuccess && (
           <div
@@ -323,6 +468,13 @@ function KosReviewDetail({ token, expireSession }) {
                   Setujui pengajuan
                 </button>
                 <button
+                  className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-100"
+                  onClick={() => setDecisionIntent('revision')}
+                  type="button"
+                >
+                  Minta revisi
+                </button>
+                <button
                   className="inline-flex items-center gap-2 rounded-lg bg-red-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-100"
                   onClick={() => setDecisionIntent('rejected')}
                   type="button"
@@ -337,14 +489,22 @@ function KosReviewDetail({ token, expireSession }) {
                   className={`rounded-lg px-4 py-3 text-sm ${
                     decisionIntent === 'rejected'
                       ? 'bg-red-50 text-red-800'
-                      : 'bg-emerald-50 text-emerald-800'
+                      : decisionIntent === 'revision'
+                        ? 'bg-orange-50 text-orange-800'
+                        : 'bg-emerald-50 text-emerald-800'
                   }`}
                 >
                   Anda akan{' '}
-                  {decisionIntent === 'approved' ? 'menyetujui' : 'menolak'}{' '}
+                  {decisionActionLabels[decisionIntent]}{' '}
                   pengajuan <strong>{kos.nama}</strong>. Tulis alasan keputusan
                   sebelum melanjutkan.
                 </div>
+                {decisionIntent === 'revision' && (
+                  <p className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
+                    Permintaan revisi ini adalah mock lokal untuk pengembangan;
+                    status belum dikirim atau disimpan oleh backend.
+                  </p>
+                )}
                 <label className="block">
                   <span className="text-sm font-medium text-slate-700">
                     Alasan keputusan <span aria-hidden="true">*</span>
@@ -373,16 +533,16 @@ function KosReviewDetail({ token, expireSession }) {
                     className={`rounded-lg px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60 ${
                       decisionIntent === 'approved'
                         ? 'bg-emerald-700 hover:bg-emerald-800 focus:ring-emerald-100'
-                        : 'bg-red-700 hover:bg-red-800 focus:ring-red-100'
+                        : decisionIntent === 'revision'
+                          ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-100'
+                          : 'bg-red-700 hover:bg-red-800 focus:ring-red-100'
                     }`}
                     disabled={!decisionNote.trim() || isSubmittingDecision}
                     type="submit"
                   >
                     {isSubmittingDecision
                       ? 'Menyimpan...'
-                      : decisionIntent === 'approved'
-                        ? 'Konfirmasi persetujuan'
-                        : 'Konfirmasi penolakan'}
+                      : decisionButtonLabels[decisionIntent]}
                   </button>
                   <button
                     className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
@@ -431,7 +591,7 @@ function KosReviewDetail({ token, expireSession }) {
                   Harga per bulan
                 </dt>
                 <dd className="mt-1 text-sm font-medium text-slate-800">
-                  {formatCurrency(kos.harga_per_bulan)}
+                  {formatCurrency(kos.harga_mulai ?? kos.harga_per_bulan)}
                 </dd>
               </div>
               <div>
@@ -494,6 +654,38 @@ function KosReviewDetail({ token, expireSession }) {
                 </p>
               )}
             </div>
+
+            {roomTypes.length > 0 && (
+              <div className="mt-6 border-t border-slate-100 pt-5">
+                <h4 className="text-sm font-semibold">Tipe kamar</h4>
+                <div className="mt-3 space-y-3">
+                  {roomTypes.map((room) => (
+                    <article
+                      className="rounded-lg border border-slate-200 p-4"
+                      key={room._id || room.nama}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <h5 className="font-semibold text-slate-800">
+                            {room.nama}
+                          </h5>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {room.ukuran || 'Ukuran tidak tersedia'}
+                          </p>
+                        </div>
+                        <p className="text-sm font-semibold text-slate-800">
+                          {formatCurrency(room.harga_per_bulan)}
+                        </p>
+                      </div>
+                      <p className="mt-3 text-xs text-slate-600">
+                        Kamar tersedia: {room.jumlah_kamar_tersedia} dari{' '}
+                        {room.jumlah_kamar_total}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
           </article>
 
           <aside className="space-y-6">
