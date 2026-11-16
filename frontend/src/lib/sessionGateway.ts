@@ -3,7 +3,7 @@ import { getBackendApiUrl } from './normalizer';
 
 const routes: Array<[RegExp, string[]]> = [
   [/^auth\/(csrf|me)$/, ['GET']],
-  [/^auth\/(login|register|logout)$/, ['POST']],
+  [/^auth\/(login|register|logout|forgot-password|reset-password)$/, ['POST']],
   [/^auth\/(profile|password)$/, ['PATCH']],
   [/^auth\/notification-preferences$/, ['GET', 'PUT']],
   [/^notifikasi(?:\/jumlah)?$/, ['GET']],

@@ -1,3 +1,6 @@
+const crypto = require('crypto');
+const { sendResetPasswordEmail } = require('../services/mailService');
+const sha256 = (v) => crypto.createHash('sha256').update(v).digest('hex');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { getJwtSecret } = require('../config/jwt');
@@ -191,4 +194,48 @@ const changePassword = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
-module.exports = { register, login, getMe, updateProfile, changePassword };
+const forgotPassword = async (req, res, next) => {
+  try {
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    const user = email ? await User.findOne({ email }) : null;
+    if (user && user.status !== 'suspended') {
+      const token = crypto.randomBytes(32).toString('base64url');
+      user.reset_token_hash = sha256(token);
+      user.reset_token_expires = new Date(Date.now() + 30 * 60 * 1000);
+      await user.save();
+      const base = (process.env.APP_ORIGIN || 'http://localhost:3000').replace(/\/$/, '');
+      const link = `${base}/reset-sandi?token=${token}`;
+      sendResetPasswordEmail(user.email, user.nama, link).catch((e) =>
+        console.error('Gagal kirim email reset:', e.message));
+    }
+    // Respons selalu sama agar email terdaftar/tidak terdaftar tidak bisa ditebak
+    res.json({ success: true, message: 'Jika email terdaftar, tautan pemulihan akan dikirim.', data: null });
+  } catch (error) { next(error); }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    if (typeof token !== 'string' || typeof password !== 'string' ||
+        password.length < 15 || Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(422).json({ success: false, message: 'Kata sandi minimal 15 karakter dan maksimal 72 byte.' });
+    }
+    const user = await User.findOne({
+      reset_token_hash: sha256(token),
+      reset_token_expires: { $gt: new Date() },
+    }).select('+password +token_version +reset_token_hash +reset_token_expires');
+    if (!user) {
+      return res.status(400).json({ success: false, code: 'TOKEN_EXPIRED', message: 'Tautan tidak valid atau sudah kedaluwarsa.' });
+    }
+    user.password = password;
+    user.password_updated_at = new Date();
+    user.token_version = (user.token_version || 0) + 1;
+    user.reset_token_hash = undefined;
+    user.reset_token_expires = undefined;
+    await user.save();
+    await Session.deleteMany({ user_id: user._id });
+    res.json({ success: true, message: 'Kata sandi berhasil diganti.', data: null });
+  } catch (error) { next(error); }
+};
+
+module.exports = { register, login, getMe, updateProfile, changePassword, forgotPassword, resetPassword };

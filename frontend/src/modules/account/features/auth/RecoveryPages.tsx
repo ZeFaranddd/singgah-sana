@@ -145,7 +145,7 @@ function EnabledResetPasswordPage() {
         label="Kata sandi baru"
         type="password"
         autoComplete="new-password"
-        helper="Minimal 8 karakter, dengan huruf dan angka."
+        helper="Minimal 15 karakter."
         {...form.field("password")}
       />
       <Field

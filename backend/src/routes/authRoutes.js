@@ -6,6 +6,8 @@ const {
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resetPassword,
 } = require('../controllers/authController');
 const { getCsrf, logout } = require('../middlewares/sessionMiddleware');
 const { protect } = require('../middlewares/authMiddleware');
@@ -17,6 +19,8 @@ const requireLoginForm = (req, res, next) => {
 };
 router.post('/register', requireLoginForm, rateLimit, register);
 router.post('/login', requireLoginForm, rateLimit, login);
+router.post('/forgot-password', requireLoginForm, rateLimit, forgotPassword);
+router.post('/reset-password', requireLoginForm, rateLimit, resetPassword);
 router.get('/csrf', getCsrf);
 router.post('/logout', logout);
 router.get('/me', protect, getMe);

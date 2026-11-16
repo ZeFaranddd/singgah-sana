@@ -14,6 +14,7 @@ const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 const { loadSession, validateCsrf } = require('./middlewares/sessionMiddleware');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Middleware Global
 app.use(cors());

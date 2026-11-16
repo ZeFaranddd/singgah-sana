@@ -45,6 +45,8 @@ const userSchema = new mongoose.Schema(
     },
     status: { type: String, enum: ['active', 'suspended'], default: 'active' },
     token_version: { type: Number, default: 0, select: false },
+    reset_token_hash: { type: String, select: false },
+    reset_token_expires: { type: Date, select: false },
     password_updated_at: { type: Date, default: null },
     notification_preferences: {
       pesanPemilik: { type: Boolean, default: true },

@@ -11,6 +11,7 @@ import { navigate, safeInternalPath, useLocation } from "../../lib/router";
 import { email, required, type Schema } from "../../lib/validation/rules";
 import { AuthCard } from "./AuthCard";
 import { useAuth } from "./AuthContext";
+import { features } from "../../lib/config";
 
 interface V extends Record<string, string> { email: string; password: string }
 const schema: Schema<V> = {
@@ -45,7 +46,9 @@ export default function LoginPage() {
       {form.formError && <Alert tone="error">{form.formError}</Alert>}
       <Field label="Alamat email" type="email" autoComplete="email" placeholder="nama@email.com" {...form.field("email")} />
       <Field label="Kata sandi" type="password" autoComplete="current-password" placeholder="Kata sandi" {...form.field("password")} />
-      <p className="muted small">Pemulihan melalui email belum diaktifkan.</p>
+      {features.recovery && (
+        <p className="auth-alt"><Link to="/lupa-sandi" className="link">Lupa kata sandi?</Link></p>
+      )}
       <Button type="submit" block loading={form.submitting}>Masuk</Button>
       <p className="auth-alt">Belum punya akun? <Link to="/daftar" className="link">Daftar</Link></p>
     </AuthCard>

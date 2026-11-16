@@ -36,7 +36,7 @@ export const features = {
   /** Kontak/inquiry saat kamar penuh belum diputuskan (K7). */
   inquiryWhenFull: true,
   /** Layanan pemulihan kata sandi (lupa sandi / reset sandi) belum tersedia di backend */
-  recovery: false,
+  recovery: true,
   /** Layanan verifikasi email belum tersedia di backend */
   emailVerification: false,
   /** Layanan penghapusan akun mandiri belum tersedia di backend */
