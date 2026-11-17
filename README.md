@@ -8,6 +8,8 @@ Tugas Akhir Mata Kuliah Pengembangan Aplikasi Web (PAW) · DTETI FT UGM · User 
 | **Aplikasi (Frontend)** | https://singgah-sana.vercel.app |
 | **API (Backend)** | https://singgah-sana-production.up.railway.app/api |
 | **Repositori** | https://github.com/ZeFaranddd/singgah-sana |
+| **PPT** | https://drive.google.com/drive/u/1/folders/1DLd_L6ydJzsjH6p1QWYV2LizsXfIdQRd |
+| **Video dan demo** | https://drive.google.com/drive/u/1/folders/17jz2ye4WLdQmZ9mGxO7RuIBG_NU_P5Kp |
 
 > Data kos pada lingkungan demo adalah **data simulasi**, bukan penawaran sewa yang telah diverifikasi di lapangan. Cakupan hasil pencarian mengikuti data yang tersedia di sistem, bukan jaminan kelengkapan seluruh daerah.
 
