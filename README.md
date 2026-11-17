@@ -58,10 +58,10 @@ Singgah Sana berfokus pada **informasi kos dan komunikasi awal**. Aplikasi tidak
 
 | Anggota | NIM | Bagian frontend | Bagian backend |
 | --- | --- | --- | --- |
-| Stella Florencia Doulim | 24/542739/TK/60285 | Publik dan UI bersama | Publik dan UI bersama |
-| Farand Hafiz | 24/540618/TK/60027 | Pencari dan akun | Pencari dan akun |
-| Faiz Gymnastiar Wibawa | 24/537851/TK/59634 | Ruang pemilik | Ruang pemilik |
-| Aurelia Mutiah Raudyatuzzahra | 24/534903/TK/59310 | Ruang admin | Ruang admin |
+| Stella Florencia Doulim | 24/542739/TK/60285 | Publik dan UI bersama | Authentication, JWT Security & RBAC |
+| Farand Hafiz | 24/540618/TK/60027 | Pencari dan akun | Pencari dan akun | Backend Architecture & Core Kos Management |
+| Faiz Gymnastiar Wibawa | 24/537851/TK/59634 | Ruang pemilik | Ruang pemilik | Inquiry System, Favorit & Postman Testing |
+| Aurelia Mutiah Raudyatuzzahra | 24/534903/TK/59310 | Ruang admin | Ruang admin | Admin Verification Workflow & Reporting/Export |
 
 ---
 
